@@ -1,6 +1,7 @@
 const app = {
   keyboard: {},
   state: {
+    gameOn: false,
     isAirborne: false,
     positionX: 0,
     positionY: 0,
@@ -14,11 +15,17 @@ const functions = [
     key: 'onKeyPress',
     output: 'code-keypress',
     code: `
-app.keyboard[evt.code] = true;
+if (evt.code === 'Enter'){
+  app.state.gameOn = true;
+} else if (evt.code === 'Escape') {
+  app.state.gameOn = false;
+} else {
+  app.keyboard[evt.code] = true;
+}
 `,
   },
   {
-    key: 'onLoop',
+    key: 'runGameLoop',
     output: 'code-loop',
     code: `
 // check keyboard input, perform actions

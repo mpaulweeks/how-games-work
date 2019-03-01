@@ -32,7 +32,7 @@ window.addEventListener('keydown', evt => {
 // init
 (async () => {
   // paint these once on page load
-  app.onLoop();
+  app.runGameLoop();
   app.onKeyPress({code: null});
 
   const runLoop = async () => {
@@ -42,12 +42,14 @@ window.addEventListener('keydown', evt => {
     Object.keys(codeBlocksByKey).forEach(codeKey => codeBlocksByKey[codeKey].classList.remove('show'));
 
     // run code, maybe show some code blocks
-    app.onLoop();
+    if (app.state.gameOn){
+      app.runGameLoop();
+    }
     return new Promise((resolve, reject) => {
       window.requestAnimationFrame(resolve);
     });
   };
-  while(!app.keyboard.Escape) {
+  while(true) {
     await runLoop();
   }
 })();
