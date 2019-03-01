@@ -12,6 +12,7 @@ const app = {
 const functions = [
   {
     key: 'onKeyPress',
+    output: 'code-keypress',
     code: `
 app.keyboard[evt.code] = true;
 `,
@@ -29,6 +30,8 @@ if (app.keyboard.Space) {
 if (app.state.speedX !== 0) {
   app.applyFriction();
 }
+
+// reset keyboard buffer
 app.keyboard = {};
 `,
   },
@@ -41,5 +44,9 @@ app.state.speedY = 10;
   }
 ].map(func => ({
   ...func,
-  display: func.code.trim(),
+  display: [
+    `app.${func.key} = () => {`,
+    ...func.code.trim().split('\n').map(line => `  ${line}`),
+    `}`,
+  ],
 }));

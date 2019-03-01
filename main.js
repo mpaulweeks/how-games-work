@@ -1,25 +1,24 @@
 const codeBlocksByKey = {};
 
 const printFunc = func => {
-  // todo print in UI
-  if (func.output) {
-    document.getElementById(func.output).innerHTML = func.display;
-  } else {
-    if (!codeBlocksByKey[func.key]){
-      const newNode = document.createElement('div');
-      newNode.classList.add('code');
-      newNode.innerHTML = func.display;
-      codeBlocksByKey[func.key] = newNode;
-    }
-    const node = codeBlocksByKey[func.key];
-    node.classList.add('show');
+  if (!codeBlocksByKey[func.key]){
+    const newNode = func.output ? document.getElementById(func.output) : document.createElement('div');
+    newNode.classList.add('code');
+    codeBlocksByKey[func.key] = newNode;
+
+    const code = func.display.join('\n');
+    newNode.innerHTML = code;
+  }
+  const node = codeBlocksByKey[func.key];
+  node.classList.add('show');
+  if (!func.output){
     document.getElementById('code-temp').prepend(node);
   }
 }
 
 // make them talk to each other, surface for printing
 functions.forEach(func => {
-  app[func.key] = () => {
+  app[func.key] = evt => {
     printFunc(func);
     eval(func.code);
   };
@@ -27,14 +26,22 @@ functions.forEach(func => {
 
 window.addEventListener('keydown', evt => {
   console.log(evt.code);
-  app.keyboard[evt.code] = true;
+  app.onKeyPress(evt);
 });
 
 // init
 (async () => {
+  // paint these once on page load
+  app.onLoop();
+  app.onKeyPress({code: null});
+
   const runLoop = async () => {
     console.log('loop');
+
+    // try to hide all code blocks
     Object.keys(codeBlocksByKey).forEach(codeKey => codeBlocksByKey[codeKey].classList.remove('show'));
+
+    // run code, maybe show some code blocks
     app.onLoop();
     return new Promise((resolve, reject) => {
       window.requestAnimationFrame(resolve);

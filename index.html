@@ -34,6 +34,7 @@
       font-family: monospace;
       white-space: pre;
       border: 1px solid grey;
+      margin: 0.5em;
       color: white;
 
       opacity: 0;
@@ -43,8 +44,13 @@
 
       transition:
         opacity 2s linear 0s,
-        max-height 0.1s linear 1.9s,
-        padding 0.1s linear 1.9s;
+        max-height 0.1s linear 2s,
+        padding 0.1s linear 2s;
+    }
+    .code.always {
+      opacity: 0.5;
+      max-height: 100%;
+      padding: 1em;
     }
     .code.show {
       opacity: 1;
@@ -60,11 +66,10 @@
 <body>
   <div id="container">
     <div class="column">
-      <pre class="code show" id="code-loop"></pre>
+      <div class="code always" id="code-loop"></div>
+      <div class="code always" id="code-keypress"></div>
     </div>
-    <div class="column">
-      <div class="code show" id="code-temp"></div>
-    </div>
+    <div class="column" id="code-temp"></div>
     <div class="column">
       <canvas id="canvas-game"></canvas>
     </div>
