@@ -1,2 +1,71 @@
-<script defer src="code.js"></script>
-<script defer src="main.js"></script>
+<head>
+  <script defer src="code.js"></script>
+  <script defer src="main.js"></script>
+
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: stretch;
+      align-items: stretch;
+      flex-wrap: nowrap;
+    }
+    #container {
+      display: flex;
+      flex-direction: row;
+      justify-content: stretch;
+      align-items: stretch;
+      flex-wrap: nowrap;
+
+      background-color: black;
+    }
+    .column {
+      flex-basis: 33%;
+
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: stretch;
+      flex-wrap: nowrap;
+
+      border: 1px solid white;
+    }
+    .code {
+      font-family: monospace;
+      white-space: pre;
+      border: 1px solid grey;
+      color: white;
+
+      opacity: 0;
+      max-height: 0px;
+      padding: 0px;
+      overflow: hidden;
+
+      transition:
+        opacity 2s linear 0s,
+        max-height 0.1s linear 1.9s,
+        padding 0.1s linear 1.9s;
+    }
+    .code.show {
+      opacity: 1;
+      max-height: 100%;
+      padding: 1em;
+      transition: opacity 0s linear 0s, height 0s linear 0s;
+    }
+    #canvas-game {
+      border: 1px solid grey;
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <div class="column">
+      <pre class="code show" id="code-loop"></pre>
+    </div>
+    <div class="column">
+      <div class="code show" id="code-temp"></div>
+    </div>
+    <div class="column">
+      <canvas id="canvas-game"></canvas>
+    </div>
+</body>

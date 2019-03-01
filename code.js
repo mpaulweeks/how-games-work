@@ -1,5 +1,5 @@
 const app = {
-  keyboardInput: {},
+  keyboard: {},
   state: {
     isAirborne: false,
     positionX: 0,
@@ -11,16 +11,17 @@ const app = {
 
 const functions = [
   {
-    k: 'onKeyPress',
-    c: `
-app.keyboardInput[evt.code] = true;
+    key: 'onKeyPress',
+    code: `
+app.keyboard[evt.code] = true;
 `,
   },
   {
-    k: 'onLoop',
-    c: `
+    key: 'onLoop',
+    output: 'code-loop',
+    code: `
 // check keyboard input, perform actions
-if (app.keyboard.SpaceBar && !app.state.isAirborne) {
+if (app.keyboard.Space) {
   app.jump();
 }
 
@@ -32,10 +33,13 @@ app.keyboard = {};
 `,
   },
   {
-    k: 'jump',
-    c: `
+    key: 'jump',
+    code: `
 app.state.isAirborne = true;
 app.state.speedY = 10;
 `,
   }
-];
+].map(func => ({
+  ...func,
+  display: func.code.trim(),
+}));
