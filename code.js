@@ -1,32 +1,41 @@
 const app = {
-  isAirborne: false,
-  speedY: 0,
-  speedX: 0,
+  keyboardInput: {},
+  state: {
+    isAirborne: false,
+    positionX: 0,
+    positionY: 0,
+    speedY: 0,
+    speedX: 0,
+  },
 };
 
 const functions = [
   {
-    k: 'onLoop',
+    k: 'onKeyPress',
     c: `
-// check keyboard input
-// perform actions
-// move character
+app.keyboardInput[evt.code] = true;
 `,
   },
   {
-    k: 'onSpaceBar',
+    k: 'onLoop',
     c: `
-console.log('you jumped!');
-app.jump();
+// check keyboard input, perform actions
+if (app.keyboard.SpaceBar && !app.state.isAirborne) {
+  app.jump();
+}
+
+// move character
+if (app.state.speedX !== 0) {
+  app.applyFriction();
+}
+app.keyboard = {};
 `,
   },
   {
     k: 'jump',
     c: `
-if (!app.isAirborne){
-  app.isAirborne = true;
-  app.speedY = 10;
-}
+app.state.isAirborne = true;
+app.state.speedY = 10;
 `,
   }
 ];
