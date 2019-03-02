@@ -15,6 +15,14 @@ const printFunc = func => {
     document.getElementById('code-temp').prepend(node);
   }
 }
+const printState = () => {
+  const node = document.getElementById('code-state');
+  node.innerHTML = JSON.stringify(app.state, Object.keys(app.state).sort(), 2);
+}
+const printKeyboard = () => {
+  const node = document.getElementById('code-keyboard');
+  node.innerHTML = JSON.stringify(app.keyboard, Object.keys(app.keyboard).sort(), 2);
+}
 
 // make them talk to each other, surface for printing
 functions.forEach(func => {
@@ -26,14 +34,19 @@ functions.forEach(func => {
 
 window.addEventListener('keydown', evt => {
   console.log(evt.code);
-  app.onKeyPress(evt);
+  app.onKeyDown(evt);
+});
+window.addEventListener('keyup', evt => {
+  console.log(evt.code);
+  app.onKeyUp(evt);
 });
 
 // init
 (async () => {
   // paint these once on page load
   app.runGameLoop();
-  app.onKeyPress({code: null});
+  app.onKeyDown({code: null});
+  app.onKeyUp({code: null});
 
   const runLoop = async () => {
     console.log('loop');
@@ -42,6 +55,8 @@ window.addEventListener('keydown', evt => {
     Object.keys(codeBlocksByKey).forEach(codeKey => codeBlocksByKey[codeKey].classList.remove('show'));
 
     // run code, maybe show some code blocks
+    printState();
+    printKeyboard();
     if (app.state.gameOn){
       app.runGameLoop();
     }
