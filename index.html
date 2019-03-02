@@ -24,8 +24,7 @@
       background-color: black;
     }
     .column {
-      flex-grow: 1;
-      flex-basis: 33%;
+      width: 450px;
 
       display: flex;
       flex-direction: column;
@@ -34,6 +33,10 @@
       flex-wrap: nowrap;
 
       border: 1px solid white;
+    }
+    .column:last-child {
+      width: auto;
+      flex-grow: 1;
     }
     .code {
       font-family: monospace;
@@ -72,11 +75,11 @@
 <body>
   <div id="container">
     <div class="column">
-      <div class="code show" id="code-state"></div>
-      <!-- <div class="code show" id="code-keyboard"></div> -->
       <div class="code always" id="code-keydown"></div>
       <div class="code always" id="code-keyup"></div>
       <div class="code always" id="code-loop"></div>
+      <div class="code show" id="code-state"></div>
+      <div class="code show" id="code-keyboard"></div>
     </div>
     <div class="column" id="code-temp"></div>
     <div class="column">

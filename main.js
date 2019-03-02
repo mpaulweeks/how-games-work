@@ -17,11 +17,11 @@ const printFunc = func => {
 }
 const printState = () => {
   const node = document.getElementById('code-state');
-  node.innerHTML = JSON.stringify(app.state, Object.keys(app.state).sort(), 2);
+  node.innerHTML = JSON.stringify(state, Object.keys(state).sort().concat('x', 'y'), 2);
 }
 const printKeyboard = () => {
   const node = document.getElementById('code-keyboard');
-  node.innerHTML = JSON.stringify(app.keyboard, Object.keys(app.keyboard).sort(), 2);
+  node.innerHTML = JSON.stringify(keyboard, Object.keys(keyboard).sort(), 2);
 }
 
 // make them talk to each other, surface for printing
@@ -47,6 +47,7 @@ window.addEventListener('keyup', evt => {
   app.runGameLoop();
   app.onKeyDown({code: null});
   app.onKeyUp({code: null});
+  state.gameOn = true;
 
   const runLoop = async () => {
     console.log('loop');
@@ -56,8 +57,8 @@ window.addEventListener('keyup', evt => {
 
     // run code, maybe show some code blocks
     printState();
-    // printKeyboard();
-    if (app.state.gameOn){
+    printKeyboard();
+    if (state.gameOn){
       app.runGameLoop();
     }
     return new Promise((resolve, reject) => {

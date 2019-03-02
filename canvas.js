@@ -9,5 +9,8 @@ app.draw = () => {
   ctx.fillRect(0, 0, canvasElm.width, canvasElm.height);
 
   ctx.fillStyle = 'pink';
-  ctx.fillRect(app.state.positionX - 10, app.state.positionY - 10, 20, 20);
+  ctx.fillRect(state.heroPosition.x - 10, state.heroPosition.y - 10, 20, 20);
+  if (state.heroBullet){
+    ctx.fillRect(state.heroBullet.x - 2, state.heroBullet.y - 5, 4, 10);
+  };
 }

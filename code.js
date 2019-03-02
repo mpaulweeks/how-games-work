@@ -1,12 +1,10 @@
-const app = {
-  keyboard: {},
-  state: {
-    gameOn: false,
-    positionX: 0,
-    positionY: 0,
-    speedY: 0,
-    speedX: 0,
-  },
+const app = {};
+const keyboard = {};
+const state = {
+  gameOn: false,
+  heroPosition: {x: 0, y: 0},
+  heroSpeed: {x: 0, y: 0},
+  heroBullet: null,
 };
 
 const functions = [
@@ -15,11 +13,11 @@ const functions = [
     output: 'code-keydown',
     code: `
 if (evt.code === 'Enter'){
-  app.state.gameOn = true;
+  state.gameOn = true;
 } else if (evt.code === 'Escape') {
-  app.state.gameOn = false;
-} else if (app.state.gameOn) {
-  app.keyboard[evt.code] = true;
+  state.gameOn = false;
+} else if (state.gameOn) {
+  keyboard[evt.code] = true;
 }
 `,
   },
@@ -27,8 +25,8 @@ if (evt.code === 'Enter'){
     key: 'onKeyUp',
     output: 'code-keyup',
     code: `
-if (app.keyboard[evt.code]) {
-  delete app.keyboard[evt.code];
+if (keyboard[evt.code]) {
+  delete keyboard[evt.code];
 }
 `,
   },
@@ -37,25 +35,16 @@ if (app.keyboard[evt.code]) {
     output: 'code-loop',
     code: `
 // check keyboard input, perform actions
-if (app.keyboard.Space) {
-  // todo
-}
-if (app.keyboard.ArrowLeft) {
-  app.moveLeft();
-}
-if (app.keyboard.ArrowRight) {
-  app.moveRight();
-}
-if (app.keyboard.ArrowUp) {
-  app.moveUp();
-}
-if (app.keyboard.ArrowDown) {
-  app.moveDown();
+if (Object.keys(keyboard).length) {
+  app.interpretKeyboardAction();
 }
 
-// move character
-if (app.state.speedX || app.state.speedY) {
-  app.applySpeed();
+// move hero
+if (state.heroSpeed.x || state.heroSpeed.y) {
+  app.applyHeroSpeed();
+}
+if (state.heroBullet) {
+  app.moveHeroBullet();
 }
 
 // update canvas
@@ -63,41 +52,85 @@ app.draw();
 `,
   },
   {
-    key: 'moveLeft',
+    key: 'interpretKeyboardAction',
     code: `
-app.state.speedX = -5;
-`,
-  },
-  {
-    key: 'moveRight',
-    code: `
-app.state.speedX = 5;
-`,
-  },
-  {
-    key: 'moveUp',
-    code: `
-app.state.speedY = -5;
-`,
-  },
-  {
-    key: 'moveDown',
-    code: `
-app.state.speedY = 5;
-`,
-  },
-  {
-    key: 'applySpeed',
-    code: `
-app.state.positionX += app.state.speedX;
-app.state.speedX = app.state.speedX * 0.9;
-if (Math.abs(app.state.speedX) < 0.1){
-  app.state.speedX = 0;
+if (keyboard.Space && !state.heroBullet) {
+  app.shootHeroBullet();
 }
-app.state.positionY += app.state.speedY;
-app.state.speedY = app.state.speedY * 0.9;
-if (Math.abs(app.state.speedY) < 0.1){
-  app.state.speedY = 0;
+if (keyboard.ArrowLeft) {
+  app.moveHeroLeft();
+}
+if (keyboard.ArrowRight) {
+  app.moveHeroRight();
+}
+if (keyboard.ArrowUp) {
+  app.moveHeroUp();
+}
+if (keyboard.ArrowDown) {
+  app.moveHeroDown();
+}
+`,
+  },
+  {
+    key: 'shootHeroBullet',
+    code: `
+state.heroBullet = {
+  x: state.heroPosition.x,
+  y: state.heroPosition.y,
+};
+`,
+  },
+  {
+    key: 'despawnHeroBullet',
+    code: `
+state.heroBullet = null;
+`,
+  },
+  {
+    key: 'moveHeroLeft',
+    code: `
+state.heroSpeed.x = -5;
+`,
+  },
+  {
+    key: 'moveHeroRight',
+    code: `
+state.heroSpeed.x = 5;
+`,
+  },
+  {
+    key: 'moveHeroUp',
+    code: `
+state.heroSpeed.y = -5;
+`,
+  },
+  {
+    key: 'moveHeroDown',
+    code: `
+state.heroSpeed.y = 5;
+`,
+  },
+  {
+    key: 'applyHeroSpeed',
+    code: `
+state.heroPosition.x += state.heroSpeed.x;
+state.heroSpeed.x = state.heroSpeed.x * 0.9;
+if (Math.abs(state.heroSpeed.x) < 0.1){
+  state.heroSpeed.x = 0;
+}
+state.heroPosition.y += state.heroSpeed.y;
+state.heroSpeed.y = state.heroSpeed.y * 0.9;
+if (Math.abs(state.heroSpeed.y) < 0.1){
+  state.heroSpeed.y = 0;
+}
+`,
+  },
+  {
+    key: 'moveHeroBullet',
+    code: `
+state.heroBullet.y -= 20;
+if (state.heroBullet.y < 0){
+  app.despawnHeroBullet();
 }
 `,
   },
