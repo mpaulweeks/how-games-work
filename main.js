@@ -56,7 +56,7 @@ window.addEventListener('keyup', evt => {
 
     // run code, maybe show some code blocks
     printState();
-    printKeyboard();
+    // printKeyboard();
     if (app.state.gameOn){
       app.runGameLoop();
     }
