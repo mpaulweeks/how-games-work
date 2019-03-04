@@ -61,27 +61,19 @@
       margin-bottom: 0px;
 
       opacity: 0;
-      max-height: 0px;
-      padding: 0px;
+      padding: 1em;
 
-      transition:
-        opacity 2s linear 0s,
-        max-height 0.1s linear 2s,
-        padding 0.1s linear 2s;
+      transition: opacity 2s linear 1s;
     }
     .code.always {
       opacity: 0.2;
-      max-height: 100%;
-      padding: 1em;
     }
     .code.show {
       opacity: 1;
-      max-height: 100%;
-      padding: 1em;
-      transition: opacity 0s linear 0s, height 0s linear 0s;
+      transition: opacity 0s linear 0s;
     }
     .line {
-      transition: color 2s linear 0s;
+      transition: color 2s linear 1s;
     }
     .line.highlight {
       transition: color 0s linear 0s;
