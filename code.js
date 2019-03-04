@@ -3,7 +3,6 @@ const keyboard = {};
 const state = {
   gameOn: false,
   heroPosition: {x: 0, y: 0},
-  heroSpeed: {x: 0, y: 0},
   heroBullet: null,
 };
 
@@ -40,9 +39,6 @@ if (Object.keys(keyboard).length) {
 }
 
 // move hero
-if (state.heroSpeed.x || state.heroSpeed.y) {
-  app.applyHeroSpeed();
-}
 if (state.heroBullet) {
   app.moveHeroBullet();
 }
@@ -103,40 +99,25 @@ state.heroBullet = null;
   {
     key: 'moveHeroLeft',
     code: `
-state.heroSpeed.x = -5;
+state.heroPosition.x += -5;
 `,
   },
   {
     key: 'moveHeroRight',
     code: `
-state.heroSpeed.x = 5;
+state.heroPosition.x += 5;
 `,
   },
   {
     key: 'moveHeroUp',
     code: `
-state.heroSpeed.y = -5;
+state.heroPosition.y += -5;
 `,
   },
   {
     key: 'moveHeroDown',
     code: `
-state.heroSpeed.y = 5;
-`,
-  },
-  {
-    key: 'applyHeroSpeed',
-    code: `
-state.heroPosition.x += state.heroSpeed.x;
-state.heroSpeed.x = state.heroSpeed.x * 0.9;
-if (Math.abs(state.heroSpeed.x) < 0.1){
-  state.heroSpeed.x = 0;
-}
-state.heroPosition.y += state.heroSpeed.y;
-state.heroSpeed.y = state.heroSpeed.y * 0.9;
-if (Math.abs(state.heroSpeed.y) < 0.1){
-  state.heroSpeed.y = 0;
-}
+state.heroPosition.y += 5;
 `,
   },
   {
