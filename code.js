@@ -9,6 +9,7 @@ const state = {
 const functions = [
   {
     key: 'onKeyDown',
+    hidePrint: true,
     output: 'code-keydown',
     code: `
 if (evt.code === 'Enter'){
@@ -22,6 +23,7 @@ if (evt.code === 'Enter'){
   },
   {
     key: 'onKeyUp',
+    hidePrint: true,
     output: 'code-keyup',
     code: `
 if (keyboard[evt.code]) {
@@ -34,8 +36,20 @@ if (keyboard[evt.code]) {
     output: 'code-loop',
     code: `
 // check keyboard input, perform actions
-if (Object.keys(keyboard).length) {
-  app.interpretKeyboardAction();
+if (keyboard.Space && !state.heroBullet) {
+  app.shootHeroBullet();
+}
+if (keyboard.ArrowLeft) {
+  app.moveHeroLeft();
+}
+if (keyboard.ArrowRight) {
+  app.moveHeroRight();
+}
+if (keyboard.ArrowUp) {
+  app.moveHeroUp();
+}
+if (keyboard.ArrowDown) {
+  app.moveHeroDown();
 }
 
 // move hero
@@ -59,26 +73,6 @@ state.heroPosition.y = canvasElm.height - 100;
     key: 'gameOver',
     code: `
 state.gameOn = false;
-`,
-  },
-  {
-    key: 'interpretKeyboardAction',
-    code: `
-if (keyboard.Space && !state.heroBullet) {
-  app.shootHeroBullet();
-}
-if (keyboard.ArrowLeft) {
-  app.moveHeroLeft();
-}
-if (keyboard.ArrowRight) {
-  app.moveHeroRight();
-}
-if (keyboard.ArrowUp) {
-  app.moveHeroUp();
-}
-if (keyboard.ArrowDown) {
-  app.moveHeroDown();
-}
 `,
   },
   {
