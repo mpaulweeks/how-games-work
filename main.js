@@ -1,19 +1,63 @@
 const codeBlocksByKey = {};
 
-const printFunc = func => {
-  if (!codeBlocksByKey[func.key]){
-    const newNode = func.output ? document.getElementById(func.output) : document.createElement('div');
-    newNode.classList.add('code');
-    codeBlocksByKey[func.key] = newNode;
+const nextColor = (() => {
+  let current = 0;
+  return () => {
+    current = (current + 1) % 5;
+    return current;
+  };
+})();
 
-    const code = func.display.join('\n');
-    newNode.innerHTML = code;
+// todo make this a smarter lookup
+const allLines = [];
+let pendingHighlights = [];
+
+const printFunc = func => {
+  let opacity = 0;
+  let node = codeBlocksByKey[func.key];
+  if (node){
+    opacity = parseFloat(window.getComputedStyle(node).opacity);
+  } else {
+    node = func.output ? document.getElementById(func.output) : document.createElement('div');
+    node.classList.add('code');
+    codeBlocksByKey[func.key] = node;
+
+    const lineElms = func.display.forEach(line => {
+      const lineElm = document.createElement('div');
+      lineElm.classList.add('line');
+      lineElm.innerHTML = line;
+
+      node.appendChild(lineElm);
+      allLines.push(lineElm);
+    });
   }
-  const node = codeBlocksByKey[func.key];
+
+  // always ensure show
   node.classList.add('show');
+  Array.from(node.children).forEach(line => {
+    line.setAttribute('data-color', '');
+    line.classList.remove('highlight');
+  });
+
   if (!func.output){
     document.getElementById('code-temp').prepend(node);
+    if (parseFloat(opacity) === 0){
+      func.highlight = nextColor();
+    }
+    node.setAttribute('data-color', func.highlight);
+    pendingHighlights.push(func);
   }
+}
+const printHighlights = () => {
+  allLines.forEach(line => {
+    pendingHighlights.forEach(func => {
+      if (line.innerHTML.includes(func.key)){
+        line.setAttribute('data-color', func.highlight);
+        line.classList.add('highlight');
+      }
+    });
+  });
+  pendingHighlights = [];
 }
 const printState = () => {
   const node = document.getElementById('code-state');
@@ -61,6 +105,7 @@ window.addEventListener('keyup', evt => {
     if (state.gameOn){
       app.runGameLoop();
     }
+    printHighlights();
     return new Promise((resolve, reject) => {
       window.requestAnimationFrame(resolve);
     });

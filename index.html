@@ -80,6 +80,28 @@
       padding: 1em;
       transition: opacity 0s linear 0s, height 0s linear 0s;
     }
+    .line {
+      transition: color 2s linear 0s;
+    }
+    .line.highlight {
+      transition: color 0s linear 0s;
+    }
+    /* https://color.adobe.com/1b5eb369261825-color-theme-12036617/?showPublished=true */
+    div[data-color="0"] {
+      color: #ED1651;
+    }
+    div[data-color="1"] {
+      color: #702C8E;
+    }
+    div[data-color="2"] {
+      color: #06C4F4;
+    }
+    div[data-color="3"] {
+      color: #8CC13F;
+    }
+    div[data-color="4"] {
+      color: #F0E705;
+    }
     #canvas-game {
       /*border: 1px solid grey;*/
       box-sizing: border-box;

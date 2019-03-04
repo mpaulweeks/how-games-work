@@ -9,20 +9,6 @@ const state = {
 
 const functions = [
   {
-    key: 'startGame',
-    code: `
-state.gameOn = true;
-state.heroPosition.x = canvasElm.width / 2;
-state.heroPosition.y = canvasElm.height - 100;
-`,
-  },
-  {
-    key: 'gameOver',
-    code: `
-state.gameOn = false;
-`,
-  },
-  {
     key: 'onKeyDown',
     output: 'code-keydown',
     code: `
@@ -63,6 +49,20 @@ if (state.heroBullet) {
 
 // update canvas
 app.draw();
+`,
+  },
+  {
+    key: 'startGame',
+    code: `
+state.gameOn = true;
+state.heroPosition.x = canvasElm.width / 2;
+state.heroPosition.y = canvasElm.height - 100;
+`,
+  },
+  {
+    key: 'gameOver',
+    code: `
+state.gameOn = false;
 `,
   },
   {
