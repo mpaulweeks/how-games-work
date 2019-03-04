@@ -1,27 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
 <head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+  <title>HOW GAMES WORKS</title>
+
   <script defer src="code.js"></script>
   <script defer src="canvas.js"></script>
   <script defer src="main.js"></script>
 
   <style>
+    html, body {
+      height: 100%;
+    }
     body {
       margin: 0px;
+      color: white;
+      background-color: black;
+
       display: flex;
       flex-direction: column;
       justify-content: stretch;
       align-items: stretch;
       flex-wrap: nowrap;
     }
+    header {
+      text-align: center;
+    }
     #container {
-      height: 100%;
+      flex-grow: 1;
 
       display: flex;
       flex-direction: row;
       justify-content: stretch;
       align-items: stretch;
       flex-wrap: nowrap;
-
-      background-color: black;
     }
     .column {
       width: 450px;
@@ -31,6 +45,7 @@
       justify-content: flex-start;
       align-items: stretch;
       flex-wrap: nowrap;
+      overflow: hidden;
 
       border: 1px solid white;
     }
@@ -42,13 +57,12 @@
       font-family: monospace;
       white-space: pre;
       border: 1px solid grey;
-      margin: 0.5em;
-      color: white;
+      margin: 1em;
+      margin-bottom: 0px;
 
       opacity: 0;
       max-height: 0px;
       padding: 0px;
-      overflow: hidden;
 
       transition:
         opacity 2s linear 0s,
@@ -73,16 +87,20 @@
   </style>
 </head>
 <body>
+  <header>
+    <h1> HOW GAMES WORK</h1>
+  </header>
   <div id="container">
     <div class="column">
       <div class="code always" id="code-keydown"></div>
       <div class="code always" id="code-keyup"></div>
       <div class="code always" id="code-loop"></div>
       <div class="code show" id="code-state"></div>
-      <div class="code show" id="code-keyboard"></div>
+      <!-- <div class="code show" id="code-keyboard"></div> -->
     </div>
     <div class="column" id="code-temp"></div>
     <div class="column">
       <canvas id="canvas-game"></canvas>
     </div>
 </body>
+</html>

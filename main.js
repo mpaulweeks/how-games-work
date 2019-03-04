@@ -33,11 +33,11 @@ functions.forEach(func => {
 });
 
 window.addEventListener('keydown', evt => {
-  console.log(evt.code);
+  // console.log(evt.code);
   app.onKeyDown(evt);
 });
 window.addEventListener('keyup', evt => {
-  console.log(evt.code);
+  // console.log(evt.code);
   app.onKeyUp(evt);
 });
 
@@ -50,14 +50,14 @@ window.addEventListener('keyup', evt => {
   state.gameOn = true;
 
   const runLoop = async () => {
-    console.log('loop');
+    // console.log('loop');
 
     // try to hide all code blocks
     Object.keys(codeBlocksByKey).forEach(codeKey => codeBlocksByKey[codeKey].classList.remove('show'));
 
     // run code, maybe show some code blocks
     printState();
-    printKeyboard();
+    // printKeyboard();
     if (state.gameOn){
       app.runGameLoop();
     }

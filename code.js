@@ -9,13 +9,27 @@ const state = {
 
 const functions = [
   {
+    key: 'startGame',
+    code: `
+state.gameOn = true;
+state.heroPosition.x = canvasElm.width / 2;
+state.heroPosition.y = canvasElm.height - 100;
+`,
+  },
+  {
+    key: 'gameOver',
+    code: `
+state.gameOn = false;
+`,
+  },
+  {
     key: 'onKeyDown',
     output: 'code-keydown',
     code: `
 if (evt.code === 'Enter'){
-  state.gameOn = true;
+  app.startGame();
 } else if (evt.code === 'Escape') {
-  state.gameOn = false;
+  app.gameOver();
 } else if (state.gameOn) {
   keyboard[evt.code] = true;
 }
