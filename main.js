@@ -25,6 +25,9 @@ const printFunc = func => {
     const lineElms = func.display.forEach(line => {
       const lineElm = document.createElement('div');
       lineElm.classList.add('line');
+      if (line.trim().slice(0,3) === '// ') {
+        lineElm.classList.add('comment');
+      }
       lineElm.innerHTML = line;
 
       node.appendChild(lineElm);
