@@ -73,11 +73,11 @@ const printKeyboard = () => {
 
 // make them talk to each other, surface for printing
 functions.forEach(func => {
-  app[func.key] = evt => {
+  app[func.key] = (...args) => {
     if (!func.hidePrint){
       printFunc(func);
     }
-    eval(func.code);
+    func.code(...args);
   };
 });
 
