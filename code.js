@@ -4,6 +4,8 @@ const state = {
   gameOn: false,
   heroPosition: {x: 0, y: 0},
   heroBullet: null,
+  enemies: [],
+  enemyBullets: [],
 };
 
 const functions = [
@@ -52,10 +54,17 @@ if (keyboard.ArrowDown) {
   app.moveHeroDown();
 }
 
-// move hero
+state.enemies.forEach(e => {
+  app.moveEnemy(e);
+});
+
+// move bullets
 if (state.heroBullet) {
   app.moveHeroBullet();
 }
+state.enemyBullets.forEach(eb => {
+  app.moveEnemyBullet(eb);
+});
 
 // update canvas
 app.draw();
