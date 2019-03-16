@@ -66,18 +66,26 @@ const printHighlights = () => {
         console.log(line.innerHTML);
         line.setAttribute('data-color', func.highlight);
         line.classList.add('highlight');
-        const pointer = linesByKey[func.key];
-        const lineRect = line.getBoundingClientRect();
-        pointer.setAttribute('x1', lineRect.x + lineRect.width/2);
-        pointer.setAttribute('y1', lineRect.bottom);
-        const funcRect = codeBlocksByKey[func.key].getBoundingClientRect();
-        pointer.setAttribute('x2', funcRect.left);
-        pointer.setAttribute('y2', funcRect.top);
-        console.log(lineRect);
       }
     });
   });
   pendingHighlights = [];
+}
+const printPointers = () => {
+  allLines.forEach(line => {
+    Object.keys(codeBlocksByKey).forEach(funcKey => {
+      if (!line.innerHTML.includes('=&gt;') && line.innerHTML.includes(funcKey)){
+        const codeBlock = codeBlocksByKey[funcKey];
+        const pointer = linesByKey[funcKey];
+        const lineRect = line.getBoundingClientRect();
+        pointer.setAttribute('x1', lineRect.x + lineRect.width/2);
+        pointer.setAttribute('y1', lineRect.bottom);
+        const funcRect = codeBlocksByKey[funcKey].getBoundingClientRect();
+        pointer.setAttribute('x2', funcRect.left);
+        pointer.setAttribute('y2', funcRect.top);
+      }
+    });
+  });
 }
 const printState = () => {
   const node = document.getElementById('code-state');
@@ -130,6 +138,7 @@ window.addEventListener('keyup', evt => {
       app.runGameLoop();
     }
     printHighlights();
+    printPointers();
     return new Promise((resolve, reject) => {
       window.requestAnimationFrame(resolve);
     });
