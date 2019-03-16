@@ -19,6 +19,7 @@
       color: white;
       background-color: black;
 
+      position: relative;
       display: flex;
       flex-direction: column;
       justify-content: stretch;
@@ -101,6 +102,19 @@
       /*border: 1px solid grey;*/
       box-sizing: border-box;
     }
+    #svg-container {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+    }
+    svg {
+      width: 100%;
+      height: 100%;
+    }
+    line {
+      stroke: white;
+      stroke-width: 1;
+    }
   </style>
 </head>
 <body>
@@ -116,8 +130,12 @@
       <!-- <div class="code show" id="code-keyboard"></div> -->
     </div>
     <div class="column" id="code-temp"></div>
-    <div class="column">
+    <div class="column canvas-container">
       <canvas id="canvas-game"></canvas>
     </div>
+  </div>
+  <div id="svg-container">
+    <svg id="svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"></svg>
+  </div>
 </body>
 </html>

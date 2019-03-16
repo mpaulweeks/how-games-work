@@ -1,4 +1,5 @@
 const codeBlocksByKey = {};
+const linesByKey = {};
 
 const nextColor = (() => {
   let current = 0;
@@ -11,6 +12,7 @@ const nextColor = (() => {
 // todo make this a smarter lookup
 const allLines = [];
 let pendingHighlights = [];
+let toPrint = [];
 
 const printFunc = func => {
   let opacity = 0;
@@ -33,7 +35,13 @@ const printFunc = func => {
       node.appendChild(lineElm);
       allLines.push(lineElm);
     });
+
+    // <line x1="50" y1="50" x2="350" y2="350" stroke="white"/>
+    let newLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    document.getElementById('svg').appendChild(newLine);
+    linesByKey[func.key] = newLine;
   }
+  const pointer = linesByKey[func.key];
 
   // always ensure show
   node.classList.add('show');
@@ -54,9 +62,18 @@ const printFunc = func => {
 const printHighlights = () => {
   allLines.forEach(line => {
     pendingHighlights.forEach(func => {
-      if (line.innerHTML.includes(func.key)){
+      if (!line.innerHTML.includes('=&gt;') && line.innerHTML.includes(func.key)){
+        console.log(line.innerHTML);
         line.setAttribute('data-color', func.highlight);
         line.classList.add('highlight');
+        const pointer = linesByKey[func.key];
+        const lineRect = line.getBoundingClientRect();
+        pointer.setAttribute('x1', lineRect.x + lineRect.width/2);
+        pointer.setAttribute('y1', lineRect.bottom);
+        const funcRect = codeBlocksByKey[func.key].getBoundingClientRect();
+        pointer.setAttribute('x2', funcRect.left);
+        pointer.setAttribute('y2', funcRect.top);
+        console.log(lineRect);
       }
     });
   });
@@ -75,7 +92,7 @@ const printKeyboard = () => {
 functions.forEach(func => {
   app[func.key] = (...args) => {
     if (!func.hidePrint){
-      printFunc(func);
+      toPrint.push(func);
     }
     func.code(...args);
   };
@@ -105,6 +122,8 @@ window.addEventListener('keyup', evt => {
     Object.keys(codeBlocksByKey).forEach(codeKey => codeBlocksByKey[codeKey].classList.remove('show'));
 
     // run code, maybe show some code blocks
+    toPrint.forEach(printFunc);
+    toPrint = [];
     printState();
     // printKeyboard();
     if (state.gameOn){
