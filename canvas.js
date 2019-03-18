@@ -20,10 +20,10 @@ app.draw = () => {
     enemyMaxY: canvasElm.height / 3,
   });
 
-  ctx.fillStyle = '#101010';
+  ctx.fillStyle = '#101050';
   ctx.fillRect(0, 0, canvasElm.width, canvasElm.height);
 
-  ctx.fillStyle = 'pink';
+  ctx.fillStyle = 'yellow';
   const heroSize = buffer/2;
   ctx.beginPath();
   ctx.moveTo(state.heroPosition.x - heroSize, state.heroPosition.y + heroSize);

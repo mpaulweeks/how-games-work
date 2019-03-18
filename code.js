@@ -1,4 +1,12 @@
-const app = {};
+const app = {
+  randomShadeOfGrey: () => {
+    function randomNoise(){
+      return Math.floor(Math.random() * 40);
+    }
+    const shade = Math.floor(Math.random() * 100) + 100;
+    return `rgb(${shade + randomNoise()}, ${shade + randomNoise()}, ${shade - randomNoise()})`;
+  },
+};
 const keyboard = {};
 const state = {
   gameOn: false,
@@ -47,7 +55,7 @@ const functions = [
     key: 'spawnEnemy',
     code: () => {
       state.enemies.push({
-        color: '#606060',
+        color: app.randomShadeOfGrey(),
         x: constants.enemySpawnX,
         y: constants.enemySpawnY,
         dx: -2,
@@ -122,7 +130,9 @@ const functions = [
       }
 
       // spawn enemies every ~300 frames
-      if (Math.random() < 0.003) {
+      if (state.enemies.length === 0) {
+        app.spawnEnemy();
+      } else if (Math.random() < 0.003) {
         app.spawnEnemy();
       }
 
