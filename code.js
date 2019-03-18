@@ -7,6 +7,13 @@ const state = {
   enemies: [],
   enemyBullets: [],
 };
+const constants = {
+  heroSpeed: 10,
+  minX: 0,
+  minY: 0,
+  maxX: 0,
+  maxY: 0,
+};
 
 const functions = [
   {
@@ -103,25 +110,37 @@ const functions = [
   {
     key: 'moveHeroLeft',
     code: () => {
-      state.heroPosition.x += -5;
+      state.heroPosition.x -= constants.heroSpeed;
+      if (state.heroPosition.x < constants.minX){
+        state.heroPosition.x = constants.minX;
+      }
     },
   },
   {
     key: 'moveHeroRight',
     code: () => {
-      state.heroPosition.x += 5;
+      state.heroPosition.x += constants.heroSpeed;
+      if (state.heroPosition.x > constants.maxX) {
+        state.heroPosition.x = constants.maxX;
+      }
     },
   },
   {
     key: 'moveHeroUp',
     code: () => {
-      state.heroPosition.y += -5;
+      state.heroPosition.y -= constants.heroSpeed;
+      if (state.heroPosition.y < constants.minY){
+        state.heroPosition.y = constants.minY;
+      }
     },
   },
   {
     key: 'moveHeroDown',
     code: () => {
-      state.heroPosition.y += 5;
+      state.heroPosition.y += constants.heroSpeed;
+      if (state.heroPosition.y > constants.maxY) {
+        state.heroPosition.y = constants.maxY;
+      }
     },
   },
   {
