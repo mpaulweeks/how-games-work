@@ -8,7 +8,7 @@ app.draw = () => {
 
   const buffer = 50;
   constants.minX = buffer;
-  constants.minY = buffer;
+  constants.minY = canvasElm.height * 2 / 3;
   constants.maxX = canvasElm.width - buffer;
   constants.maxY = canvasElm.height - buffer;
 
@@ -16,7 +16,13 @@ app.draw = () => {
   ctx.fillRect(0, 0, canvasElm.width, canvasElm.height);
 
   ctx.fillStyle = 'pink';
-  ctx.fillRect(state.heroPosition.x - 10, state.heroPosition.y - 10, 20, 20);
+  const heroSize = buffer/2;
+  ctx.beginPath();
+  ctx.moveTo(state.heroPosition.x - heroSize, state.heroPosition.y + heroSize);
+  ctx.lineTo(state.heroPosition.x, state.heroPosition.y - heroSize);
+  ctx.lineTo(state.heroPosition.x + heroSize, state.heroPosition.y + heroSize);
+  ctx.closePath();
+  ctx.fill();
   if (state.heroBullet){
     ctx.fillRect(state.heroBullet.x - 2, state.heroBullet.y - 5, 4, 10);
   };
