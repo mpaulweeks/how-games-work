@@ -6,7 +6,7 @@ app.draw = () => {
   canvasElm.width = canvasElm.parentElement.clientWidth;
   canvasElm.height = canvasElm.parentElement.clientHeight;
 
-  const buffer = 50;
+  const { buffer, bodySize } = constants;
   Object.assign(constants, {
     canvasWidth: canvasElm.width,
     canvasHeight: canvasElm.height,
@@ -24,11 +24,10 @@ app.draw = () => {
   ctx.fillRect(0, 0, canvasElm.width, canvasElm.height);
 
   ctx.fillStyle = 'yellow';
-  const heroSize = buffer/2;
   ctx.beginPath();
-  ctx.moveTo(state.heroPosition.x - heroSize, state.heroPosition.y + heroSize);
-  ctx.lineTo(state.heroPosition.x, state.heroPosition.y - heroSize);
-  ctx.lineTo(state.heroPosition.x + heroSize, state.heroPosition.y + heroSize);
+  ctx.moveTo(state.heroPosition.x - bodySize, state.heroPosition.y + bodySize);
+  ctx.lineTo(state.heroPosition.x, state.heroPosition.y - bodySize);
+  ctx.lineTo(state.heroPosition.x + bodySize, state.heroPosition.y + bodySize);
   ctx.closePath();
   ctx.fill();
   if (state.heroBullet){
@@ -38,8 +37,8 @@ app.draw = () => {
   ctx.strokeStyle = '#FFFFFF';
   state.enemies.forEach(enemy => {
     ctx.fillStyle = enemy.color;
-    ctx.fillRect(enemy.x - heroSize, enemy.y - heroSize, 2*heroSize, 2*heroSize);
-    ctx.strokeRect(enemy.x - heroSize, enemy.y - heroSize, 2*heroSize, 2*heroSize);
+    ctx.fillRect(enemy.x - bodySize, enemy.y - bodySize, 2*bodySize, 2*bodySize);
+    ctx.strokeRect(enemy.x - bodySize, enemy.y - bodySize, 2*bodySize, 2*bodySize);
   });
   state.enemyBullets.forEach(eb => {
     ctx.strokeStyle = eb.color;

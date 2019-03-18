@@ -103,7 +103,7 @@ functions.forEach(func => {
     if (!func.hidePrint){
       toPrint.push(func);
     }
-    func.code(...args);
+    return func.code(...args);
   };
 });
 

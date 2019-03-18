@@ -16,6 +16,8 @@ const state = {
   enemyBullets: [],
 };
 const constants = {
+  buffer: 50,
+  bodySize: 25,
   heroSpeed: 10,
   bulletSpeed: 40,
   minX: 0,
@@ -85,6 +87,7 @@ const functions = [
   },
   {
     key: 'shootEnemyBullet',
+    hidePrint: true,
     code: (enemy) => {
       state.enemyBullets.push({
         color: enemy.color,
@@ -101,6 +104,19 @@ const functions = [
         eb.y += 0.1 * constants.bulletSpeed;
         return eb.y < constants.canvasHeight;
       });
+    },
+  },
+  {
+    key: 'isTouching',
+    code: (body, bullet) => {
+      if (!bullet) {
+        return false;
+      }
+      const distance = Math.sqrt(
+        Math.pow(body.x - bullet.x, 2) +
+        Math.pow(body.y - bullet.y, 2)
+      );
+      return !!(distance < constants.bodySize);
     },
   },
   {
@@ -136,6 +152,16 @@ const functions = [
         app.spawnEnemy();
       }
 
+      // cleanup dead enemies
+      state.enemies = state.enemies.filter(e => {
+        const isDead = app.isTouching(e, state.heroBullet);
+        if (isDead){
+          // todo play explosion
+          app.despawnHeroBullet();
+        }
+        return !isDead;
+      });
+
       // move enemies around
       state.enemies.forEach(e => {
         app.moveEnemyShip(e);
@@ -145,10 +171,16 @@ const functions = [
       });
       app.moveEnemyBullets();
 
+      // check for hero being hit
+      state.enemyBullets.forEach(eb => {
+        const isDead = app.isTouching(state.heroPosition, eb);
+        // todo
+      })
+
       // update the canvas
       app.draw();
-      },
     },
+  },
   {
     key: 'startGame',
     code: () => {
