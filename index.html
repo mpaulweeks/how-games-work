@@ -57,19 +57,20 @@
     .code {
       font-family: monospace;
       white-space: pre;
-      border: 1px solid grey;
       margin: 1em;
       margin-bottom: 0px;
-
+      border: 1px solid grey;
+    }
+    .showable {
       opacity: 0;
       padding: 1em;
 
       transition: opacity 2s linear 1s;
     }
-    .code.always {
+    .showable.always {
       opacity: 0.2;
     }
-    .code.show {
+    .showable.show {
       opacity: 1;
       transition: opacity 0s linear 0s;
     }
@@ -78,22 +79,6 @@
     }
     .line.highlight {
       transition: color 0s linear 0s;
-    }
-    /* https://color.adobe.com/1b5eb369261825-color-theme-12036617/?showPublished=true */
-    div[data-color="0"] {
-      color: #ED1651;
-    }
-    div[data-color="1"] {
-      color: #702C8E;
-    }
-    div[data-color="2"] {
-      color: #06C4F4;
-    }
-    div[data-color="3"] {
-      color: #8CC13F;
-    }
-    div[data-color="4"] {
-      color: #F0E705;
     }
     .line.comment {
       opacity: 0.5;
@@ -116,6 +101,30 @@
       stroke: white;
       stroke-width: 1;
     }
+    div, line, .code {
+      color: var(--show-color);
+      stroke: var(--show-color);
+      border-color: var(--show-color);
+    }
+    .code.always {
+      border-color: grey;
+    }
+    /* https://color.adobe.com/1b5eb369261825-color-theme-12036617/?showPublished=true */
+    *[data-color="0"] {
+      --show-color: #ED1651;
+    }
+    *[data-color="1"] {
+      --show-color: #702C8E;
+    }
+    *[data-color="2"] {
+      --show-color: #06C4F4;
+    }
+    *[data-color="3"] {
+      --show-color: #8CC13F;
+    }
+    *[data-color="4"] {
+      --show-color: #F0E705;
+    }
   </style>
 </head>
 <body>
@@ -124,11 +133,11 @@
   </header>
   <div id="container">
     <div class="column">
-      <!-- <div class="code always" id="code-keydown"></div> -->
-      <!-- <div class="code always" id="code-keyup"></div> -->
-      <div class="code always" id="code-loop"></div>
-      <div class="code show" id="code-state"></div>
-      <!-- <div class="code show" id="code-keyboard"></div> -->
+      <!-- <div class="code showable always" id="code-keydown"></div> -->
+      <!-- <div class="code showable always" id="code-keyup"></div> -->
+      <div class="code showable always" id="code-loop"></div>
+      <div class="code showable show" id="code-state"></div>
+      <!-- <div class="code showable show" id="code-keyboard"></div> -->
     </div>
     <div class="column" id="code-temp"></div>
     <div class="column canvas-container">

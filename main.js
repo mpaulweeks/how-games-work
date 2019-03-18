@@ -1,5 +1,5 @@
 const codeBlocksByKey = {};
-const linesByKey = {};
+const pointersByKey = {};
 
 const nextColor = (() => {
   let current = 0;
@@ -22,6 +22,7 @@ const printFunc = func => {
   } else {
     node = func.output ? document.getElementById(func.output) : document.createElement('div');
     node.classList.add('code');
+    node.classList.add('showable');
     codeBlocksByKey[func.key] = node;
 
     const lineElms = func.display.forEach(line => {
@@ -38,13 +39,16 @@ const printFunc = func => {
 
     // <line x1="50" y1="50" x2="350" y2="350" stroke="white"/>
     let newLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    newLine.classList.add('showable');
     document.getElementById('svg').appendChild(newLine);
-    linesByKey[func.key] = newLine;
+    pointersByKey[func.key] = newLine;
   }
-  const pointer = linesByKey[func.key];
+  const pointer = pointersByKey[func.key];
 
-  // always ensure show
+  // add show to make it fade in
+  // main loop removes show immediately afterward
   node.classList.add('show');
+  pointer.classList.add('show');
   Array.from(node.children).forEach(line => {
     line.setAttribute('data-color', '');
     line.classList.remove('highlight');
@@ -56,6 +60,7 @@ const printFunc = func => {
       func.highlight = nextColor();
     }
     node.setAttribute('data-color', func.highlight);
+    pointer.setAttribute('data-color', func.highlight);
     pendingHighlights.push(func);
   }
 }
@@ -63,7 +68,7 @@ const printHighlights = () => {
   allLines.forEach(line => {
     pendingHighlights.forEach(func => {
       if (!line.innerHTML.includes('=&gt;') && line.innerHTML.includes(func.key)){
-        console.log(line.innerHTML);
+        console.log('highlighting:', line.innerHTML);
         line.setAttribute('data-color', func.highlight);
         line.classList.add('highlight');
       }
@@ -76,7 +81,7 @@ const printPointers = () => {
     Object.keys(codeBlocksByKey).forEach(funcKey => {
       if (!line.innerHTML.includes('=&gt;') && line.innerHTML.includes(funcKey)){
         const codeBlock = codeBlocksByKey[funcKey];
-        const pointer = linesByKey[funcKey];
+        const pointer = pointersByKey[funcKey];
         const lineRect = line.getBoundingClientRect();
         pointer.setAttribute('x1', lineRect.x + lineRect.width/2);
         pointer.setAttribute('y1', lineRect.bottom);
@@ -128,15 +133,16 @@ window.addEventListener('keyup', evt => {
 
     // try to hide all code blocks
     Object.keys(codeBlocksByKey).forEach(codeKey => codeBlocksByKey[codeKey].classList.remove('show'));
+    Object.keys(pointersByKey).forEach(pointerKey => pointersByKey[pointerKey].classList.remove('show'));
 
     // run code, maybe show some code blocks
-    toPrint.forEach(printFunc);
-    toPrint = [];
     printState();
     // printKeyboard();
     if (state.gameOn){
       app.runGameLoop();
     }
+    toPrint.forEach(printFunc);
+    toPrint = [];
     printHighlights();
     printPointers();
     return new Promise((resolve, reject) => {
