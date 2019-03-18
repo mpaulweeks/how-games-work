@@ -119,6 +119,7 @@ window.addEventListener('keyup', evt => {
 // init
 (async () => {
   // paint these once on page load
+  app.draw();
   app.runGameLoop();
   app.onKeyDown({code: null});
   app.onKeyUp({code: null});

@@ -1,5 +1,9 @@
 # todo
 
+- move more enemy funcs into obscurity
+- ramp up spawn rate as game goes on
+- add simple hit detection
+- make enemies spawn as random colors
 - start hero in bottom/middle
 - enemies array
   - move enemies
