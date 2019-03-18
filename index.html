@@ -15,6 +15,7 @@
       height: 100%;
     }
     body {
+      font-family: monospace;
       margin: 0px;
       color: white;
       background-color: black;
@@ -28,6 +29,13 @@
     }
     header {
       text-align: center;
+    }
+    header div {
+      font-size: 3em;
+      margin-top: 0.5em;
+    }
+    header a {
+      color: lightblue;
     }
     #container {
       flex-grow: 1;
@@ -129,7 +137,14 @@
 </head>
 <body>
   <header>
-    <h1> HOW GAMES WORK</h1>
+    <div> HOW GAMES WORK</div>
+    <p>
+      a peek under the hood of a standard "game loop"
+      <br/>
+      as you play the game, the code will appear in the middle
+      <br/>
+      you can view the full source on <a href="https://github.com/mpaulweeks/how-games-work">github</a>
+    </p>
   </header>
   <div id="container">
     <div class="column">

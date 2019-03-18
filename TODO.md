@@ -1,7 +1,5 @@
 # todo
 
-- make h1 link to github
-  - add small blurb about what it is
 - start hero in bottom/middle
 - enemies array
   - move enemies

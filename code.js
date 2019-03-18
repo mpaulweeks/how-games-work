@@ -111,7 +111,7 @@ const functions = [
     key: 'moveHeroLeft',
     code: () => {
       state.heroPosition.x -= constants.heroSpeed;
-      if (state.heroPosition.x < constants.minX){
+      if (state.heroPosition.x < constants.minX) {
         state.heroPosition.x = constants.minX;
       }
     },
@@ -129,7 +129,7 @@ const functions = [
     key: 'moveHeroUp',
     code: () => {
       state.heroPosition.y -= constants.heroSpeed;
-      if (state.heroPosition.y < constants.minY){
+      if (state.heroPosition.y < constants.minY) {
         state.heroPosition.y = constants.minY;
       }
     },
