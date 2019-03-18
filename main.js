@@ -1,5 +1,4 @@
-const codeBlocksByKey = {};
-const pointersByKey = {};
+const domLookup = {};
 
 const nextColor = (() => {
   let current = 0;
@@ -16,14 +15,17 @@ let toPrint = [];
 
 const printFunc = func => {
   let opacity = 0;
-  let node = codeBlocksByKey[func.key];
-  if (node){
-    opacity = parseFloat(window.getComputedStyle(node).opacity);
+  let { codeElm, pointerElm } = domLookup[func.key] || {};
+  if (codeElm){
+    opacity = parseFloat(window.getComputedStyle(codeElm).opacity);
   } else {
-    node = func.output ? document.getElementById(func.output) : document.createElement('div');
-    node.classList.add('code');
-    node.classList.add('showable');
-    codeBlocksByKey[func.key] = node;
+    codeElm = func.output ? document.getElementById(func.output) : document.createElement('div');
+    codeElm.classList.add('code');
+    codeElm.classList.add('showable');
+    pointerElm = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    pointerElm.classList.add('showable');
+    document.getElementById('svg').appendChild(pointerElm);
+    domLookup[func.key] = { codeElm, pointerElm };
 
     const lineElms = func.display.forEach(line => {
       const lineElm = document.createElement('div');
@@ -33,34 +35,27 @@ const printFunc = func => {
       }
       lineElm.innerHTML = line;
 
-      node.appendChild(lineElm);
+      codeElm.appendChild(lineElm);
       allLines.push(lineElm);
     });
-
-    // <line x1="50" y1="50" x2="350" y2="350" stroke="white"/>
-    let newLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-    newLine.classList.add('showable');
-    document.getElementById('svg').appendChild(newLine);
-    pointersByKey[func.key] = newLine;
   }
-  const pointer = pointersByKey[func.key];
 
   // add show to make it fade in
   // main loop removes show immediately afterward
-  node.classList.add('show');
-  pointer.classList.add('show');
-  Array.from(node.children).forEach(line => {
+  codeElm.classList.add('show');
+  pointerElm.classList.add('show');
+  Array.from(codeElm.children).forEach(line => {
     line.setAttribute('data-color', '');
     line.classList.remove('highlight');
   });
 
   if (!func.output){
-    document.getElementById('code-temp').prepend(node);
+    document.getElementById('code-temp').prepend(codeElm);
     if (parseFloat(opacity) === 0){
       func.highlight = nextColor();
     }
-    node.setAttribute('data-color', func.highlight);
-    pointer.setAttribute('data-color', func.highlight);
+    codeElm.setAttribute('data-color', func.highlight);
+    pointerElm.setAttribute('data-color', func.highlight);
     pendingHighlights.push(func);
   }
 }
@@ -68,7 +63,6 @@ const printHighlights = () => {
   allLines.forEach(line => {
     pendingHighlights.forEach(func => {
       if (!line.innerHTML.includes('=&gt;') && line.innerHTML.includes(func.key)){
-        console.log('highlighting:', line.innerHTML);
         line.setAttribute('data-color', func.highlight);
         line.classList.add('highlight');
       }
@@ -78,27 +72,29 @@ const printHighlights = () => {
 }
 const printPointers = () => {
   allLines.forEach(line => {
-    Object.keys(codeBlocksByKey).forEach(funcKey => {
+    Object.keys(domLookup).forEach(funcKey => {
       if (!line.innerHTML.includes('=&gt;') && line.innerHTML.includes(funcKey)){
-        const codeBlock = codeBlocksByKey[funcKey];
-        const pointer = pointersByKey[funcKey];
+        const { codeElm, pointerElm } = domLookup[funcKey];
         const lineRect = line.getBoundingClientRect();
-        pointer.setAttribute('x1', lineRect.x + lineRect.width/2);
-        pointer.setAttribute('y1', lineRect.bottom);
-        const funcRect = codeBlocksByKey[funcKey].getBoundingClientRect();
-        pointer.setAttribute('x2', funcRect.left);
-        pointer.setAttribute('y2', funcRect.top);
+        // todo must be better way than pointing from halfway thru line
+        pointerElm.setAttribute('x1', lineRect.x + lineRect.width/2);
+        pointerElm.setAttribute('y1', lineRect.bottom);
+        const funcRect = codeElm.getBoundingClientRect();
+        pointerElm.setAttribute('x2', funcRect.left);
+        pointerElm.setAttribute('y2', funcRect.top);
       }
     });
   });
 }
 const printState = () => {
-  const node = document.getElementById('code-state');
-  node.innerHTML = JSON.stringify(state, Object.keys(state).sort().concat('x', 'y'), 2);
+  document.getElementById('code-state').innerHTML = (
+    JSON.stringify(state, Object.keys(state).sort().concat('x', 'y'), 2)
+  );
 }
 const printKeyboard = () => {
-  const node = document.getElementById('code-keyboard');
-  node.innerHTML = JSON.stringify(keyboard, Object.keys(keyboard).sort(), 2);
+  document.getElementById('code-keyboard').innerHTML = (
+    JSON.stringify(keyboard, Object.keys(keyboard).sort(), 2)
+  );
 }
 
 // make them talk to each other, surface for printing
@@ -132,8 +128,11 @@ window.addEventListener('keyup', evt => {
     // console.log('loop');
 
     // try to hide all code blocks
-    Object.keys(codeBlocksByKey).forEach(codeKey => codeBlocksByKey[codeKey].classList.remove('show'));
-    Object.keys(pointersByKey).forEach(pointerKey => pointersByKey[pointerKey].classList.remove('show'));
+    Object.keys(domLookup).forEach(funcKey => {
+      const { codeElm, pointerElm } = domLookup[funcKey];
+      codeElm.classList.remove('show');
+      pointerElm.classList.remove('show');
+    });
 
     // run code, maybe show some code blocks
     printState();
