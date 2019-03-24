@@ -33,9 +33,12 @@ const functions = [
     output: 'code-keydown',
     code: (evt) => {
       if (evt.code === 'Enter'){
-        app.startGame();
+        if (!state.gameOn){
+          app.startGame();
+        }
       } else if (evt.code === 'Escape') {
         app.gameOver();
+        app.draw();
       } else if (evt.code === 'KeyQ') {
         app.spawnEnemy();
       } else if (state.gameOn) {
@@ -67,7 +70,6 @@ const functions = [
   },
   {
     key: 'moveEnemyShip',
-    hidePrint: true,
     code: (enemy) => {
       enemy.x += enemy.dx;
       enemy.y += enemy.dy;
@@ -87,7 +89,6 @@ const functions = [
   },
   {
     key: 'shootEnemyBullet',
-    hidePrint: true,
     code: (enemy) => {
       state.enemyBullets.push({
         color: enemy.color,
@@ -98,7 +99,6 @@ const functions = [
   },
   {
     key: 'moveEnemyBullets',
-    hidePrint: true,
     code: () => {
       state.enemyBullets = state.enemyBullets.filter(eb => {
         eb.y += 0.1 * constants.bulletSpeed;
@@ -107,16 +107,26 @@ const functions = [
     },
   },
   {
-    key: 'isTouching',
-    code: (body, bullet) => {
-      if (!bullet) {
+    key: 'checkEnemyHit',
+    code: (body) => {
+      if (!state.heroBullet){
         return false;
       }
       const distance = Math.sqrt(
-        Math.pow(body.x - bullet.x, 2) +
-        Math.pow(body.y - bullet.y, 2)
+        Math.pow(body.x - state.heroBullet.x, 2) +
+        Math.pow(body.y - state.heroBullet.y, 2)
       );
       return !!(distance < constants.bodySize);
+    },
+  },
+  {
+    key: 'checkHeroHit',
+    code: (bullet) => {
+      const distance = Math.sqrt(
+        Math.pow(state.heroPosition.x - bullet.x, 2) +
+        Math.pow(state.heroPosition.y - bullet.y, 2)
+      );
+      return !!(distance < constants.bodySize * 0.75);
     },
   },
   {
@@ -143,24 +153,15 @@ const functions = [
       // move your bullets
       if (state.heroBullet) {
         app.moveHeroBullet();
+        state.enemies = state.enemies.filter(e => {
+          const isDead = app.checkEnemyHit(e);
+          if (isDead){
+            // todo play explosion
+            app.despawnHeroBullet();
+          }
+          return !isDead;
+        });
       }
-
-      // spawn enemies every ~300 frames
-      if (state.enemies.length === 0) {
-        app.spawnEnemy();
-      } else if (Math.random() < 0.003) {
-        app.spawnEnemy();
-      }
-
-      // cleanup dead enemies
-      state.enemies = state.enemies.filter(e => {
-        const isDead = app.isTouching(e, state.heroBullet);
-        if (isDead){
-          // todo play explosion
-          app.despawnHeroBullet();
-        }
-        return !isDead;
-      });
 
       // move enemies around
       state.enemies.forEach(e => {
@@ -173,9 +174,16 @@ const functions = [
 
       // check for hero being hit
       state.enemyBullets.forEach(eb => {
-        const isDead = app.isTouching(state.heroPosition, eb);
-        // todo
-      })
+        const isDead = app.checkHeroHit(eb);
+        if (isDead) {
+          app.gameOver();
+        }
+      });
+
+      // spawn new enemies every ~300 frames
+      if (Math.random() < 0.003) {
+        app.spawnEnemy();
+      }
 
       // update the canvas
       app.draw();

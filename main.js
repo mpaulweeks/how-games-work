@@ -116,39 +116,48 @@ window.addEventListener('keyup', evt => {
   app.onKeyUp(evt);
 });
 
+
+const runLoop = async () => {
+  // try to hide all code blocks
+  Object.keys(domLookup).forEach(funcKey => {
+    const { codeElm, pointerElm } = domLookup[funcKey];
+    codeElm.classList.remove('show');
+    pointerElm.classList.remove('show');
+  });
+
+  // run code, maybe show some code blocks
+  // printState();
+  // printKeyboard();
+  if (state.gameOn){
+    app.runGameLoop();
+  }
+  toPrint.forEach(printFunc);
+  toPrint = [];
+  printHighlights();
+  printPointers();
+
+  // return promise that will wait for next frame
+  return new Promise((resolve, reject) => {
+    window.requestAnimationFrame(resolve);
+  });
+};
+
 // init
 (async () => {
   // paint these once on page load
+  // app.draw();
+  // app.runGameLoop();
+  // app.onKeyDown({code: null});
+  // app.onKeyUp({code: null});
+
+  // init ship at bottom
+  app.startGame();
+  await runLoop();
+  app.startGame();
+  await runLoop();
+  app.gameOver();
   app.draw();
-  app.runGameLoop();
-  app.onKeyDown({code: null});
-  app.onKeyUp({code: null});
-  state.gameOn = true;
 
-  const runLoop = async () => {
-    // console.log('loop');
-
-    // try to hide all code blocks
-    Object.keys(domLookup).forEach(funcKey => {
-      const { codeElm, pointerElm } = domLookup[funcKey];
-      codeElm.classList.remove('show');
-      pointerElm.classList.remove('show');
-    });
-
-    // run code, maybe show some code blocks
-    printState();
-    // printKeyboard();
-    if (state.gameOn){
-      app.runGameLoop();
-    }
-    toPrint.forEach(printFunc);
-    toPrint = [];
-    printHighlights();
-    printPointers();
-    return new Promise((resolve, reject) => {
-      window.requestAnimationFrame(resolve);
-    });
-  };
   while(true) {
     await runLoop();
   }

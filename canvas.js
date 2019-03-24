@@ -47,4 +47,18 @@ app.draw = () => {
     ctx.lineWidth = 4;
     ctx.stroke();
   });
+
+  if (!state.gameOn) {
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+    ctx.fillRect(0, 0, canvasElm.width, canvasElm.height);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = '40px monospace';
+    ctx.textBaseline = 'middle';
+    ctx.textAlign = 'center';
+    ctx.fillText('GAME OVER', canvasElm.width/2, (canvasElm.height / 2) - 50);
+    ctx.font = '20px monospace';
+    ctx.fillText('press ENTER to start', canvasElm.width/2, (canvasElm.height / 2) + 50);
+    ctx.fillText('use ARROW KEYS to move', canvasElm.width/2, (canvasElm.height / 2) + 80);
+    ctx.fillText('press SPACE to shoot', canvasElm.width/2, (canvasElm.height / 2) + 110);
+  }
 }
