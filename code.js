@@ -44,6 +44,9 @@ const functions = [
       } else if (state.gameOn) {
         keyboard[evt.code] = true;
       }
+      if (evt.code === 'Space' || evt.code.includes('Arrow')){
+        evt.preventDefault();
+      }
     },
   },
   {
@@ -195,6 +198,9 @@ const functions = [
       state.gameOn = true;
       state.heroPosition.x = canvasElm.width / 2;
       state.heroPosition.y = canvasElm.height - 100;
+      state.heroBullet = null;
+      state.enemies = [];
+      state.enemyBullets = [];
     },
   },
   {

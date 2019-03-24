@@ -1,10 +1,11 @@
 const canvasElm = document.getElementById('canvas-game');
 const ctx = canvasElm.getContext('2d');
 
+canvasElm.height = canvasElm.parentElement.clientHeight;
+
 app.canvas = canvasElm;
 app.draw = () => {
   canvasElm.width = canvasElm.parentElement.clientWidth;
-  canvasElm.height = canvasElm.parentElement.clientHeight;
 
   const { buffer, bodySize } = constants;
   Object.assign(constants, {
