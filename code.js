@@ -16,11 +16,15 @@ const state = {
   orbs: [],
 };
 const constants = {
+  spawnFreq: 300,
   buffer: 50,
-  bodySize: 25,
-  heroSpeed: 3,
-  orbSpeed: 40,
+  enemySize: 25,
+  heroSize: 10,
+  heroSpeed: 5,
+  orbSpeed: 100,
   maxOrbs: 50,
+  orbMinRadius: 30,
+  orbMaxRadius: 50,
   minX: 0,
   minY: 0,
   maxX: 0,
@@ -64,9 +68,10 @@ const functions = [
     key: 'spawnEnemy',
     code: () => {
       state.enemies.push({
+        fireFreq: 30 + Math.floor(30 * Math.random()),
         color: app.randomShadeOfGrey(),
         x: Math.random() * constants.canvasWidth,
-        y: constants.enemySpawnY,
+        y: 0 - constants.enemySize,
         dx: (Math.random() - 0.5) * 2,
         dy: (Math.random() - 0.5) * 2,
       });
@@ -74,6 +79,7 @@ const functions = [
   },
   {
     key: 'moveEnemy',
+    hidePrint: true,
     code: (enemy) => {
       enemy.x += enemy.dx;
       enemy.y += enemy.dy;
@@ -98,7 +104,13 @@ const functions = [
             color: enemy.color,
             x: enemy.x,
             y: enemy.y,
-            radius: 5 + Math.floor(Math.random() * 5),
+            radius: (
+              constants.orbMinRadius +
+              Math.floor(
+                Math.random() *
+                (constants.orbMaxRadius - constants.orbMinRadius)
+              )
+            ),
           };
           break;
         }
@@ -113,6 +125,7 @@ const functions = [
   },
   {
     key: 'checkHeroHit',
+    hidePrint: true,
     code: (orb) => {
       const distance = Math.sqrt(
         Math.pow(state.heroPosition.x - orb.x, 2) +
@@ -125,15 +138,17 @@ const functions = [
     key: 'runGameLoop',
     output: 'code-loop',
     code: () => {
+      state.ticks += 1;
+
       // move enemies around
       state.enemies.forEach(e => {
-        if (Math.random() < 0.03)
+        if (state.ticks % e.fireFreq === 0)
           app.shootOrb(e);
         app.moveEnemy(e);
       });
 
-      // spawn new enemies every ~300 frames
-      if (Math.random() < 0.003)
+      // spawn new enemies
+      if (state.ticks % constants.spawnFreq === 0)
         app.spawnEnemy();
 
       // check keyboard input, perform actions
@@ -152,8 +167,7 @@ const functions = [
           return;
         orb.y += 0.1 * constants.orbSpeed;
         if (app.checkHeroHit(orb))
-          // app.gameOver();
-          console.log('dead');
+          app.gameOver();
         if (orb.y > constants.canvasHeight + orb.radius)
           app.despawnOrb(orb);
       });
@@ -166,14 +180,12 @@ const functions = [
     key: 'startGame',
     code: () => {
       state.gameOn = true;
+      state.ticks = 0;
       state.heroPosition.x = canvasElm.width / 2;
       state.heroPosition.y = canvasElm.height - 100;
       state.heroBullet = null;
       state.enemies = [];
       state.orbs = [];
-      for (let i = 0; i < 10; i++){
-        app.spawnEnemy();
-      }
       for (let i = 0; i < constants.maxOrbs; i++){
         state.orbs[i] = {
           alive: false,

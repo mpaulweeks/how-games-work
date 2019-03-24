@@ -7,15 +7,14 @@ app.canvas = canvasElm;
 app.draw = () => {
   canvasElm.width = canvasElm.parentElement.clientWidth;
 
-  const { buffer, bodySize } = constants;
+  const { buffer, heroSize, enemySize } = constants;
   Object.assign(constants, {
     canvasWidth: canvasElm.width,
     canvasHeight: canvasElm.height,
-    minX: buffer,
-    minY: canvasElm.height * 2 / 3,
-    maxX: canvasElm.width - buffer,
-    maxY: canvasElm.height - buffer,
-    enemySpawnY: 0 - buffer,
+    minX: heroSize,
+    minY: heroSize,
+    maxX: canvasElm.width - heroSize,
+    maxY: canvasElm.height - heroSize,
     enemyMinY: buffer,
     enemyMaxY: canvasElm.height / 3,
   });
@@ -25,9 +24,9 @@ app.draw = () => {
 
   ctx.fillStyle = 'yellow';
   ctx.beginPath();
-  ctx.moveTo(state.heroPosition.x - bodySize, state.heroPosition.y + bodySize);
-  ctx.lineTo(state.heroPosition.x, state.heroPosition.y - bodySize);
-  ctx.lineTo(state.heroPosition.x + bodySize, state.heroPosition.y + bodySize);
+  ctx.moveTo(state.heroPosition.x - heroSize, state.heroPosition.y + heroSize);
+  ctx.lineTo(state.heroPosition.x, state.heroPosition.y - heroSize);
+  ctx.lineTo(state.heroPosition.x + heroSize, state.heroPosition.y + heroSize);
   ctx.closePath();
   ctx.fill();
   if (state.heroBullet){
@@ -37,8 +36,8 @@ app.draw = () => {
   ctx.strokeStyle = '#FFFFFF';
   state.enemies.forEach(enemy => {
     ctx.fillStyle = enemy.color;
-    ctx.fillRect(enemy.x - bodySize, enemy.y - bodySize, 2*bodySize, 2*bodySize);
-    ctx.strokeRect(enemy.x - bodySize, enemy.y - bodySize, 2*bodySize, 2*bodySize);
+    ctx.fillRect(enemy.x - enemySize, enemy.y - enemySize, 2*enemySize, 2*enemySize);
+    ctx.strokeRect(enemy.x - enemySize, enemy.y - enemySize, 2*enemySize, 2*enemySize);
   });
   state.orbs.forEach(orb => {
     if (!orb.alive){
@@ -64,4 +63,12 @@ app.draw = () => {
     ctx.fillText('use ARROW KEYS to move', canvasElm.width/2, (canvasElm.height / 2) + 80);
     ctx.fillText('press SPACE to shoot', canvasElm.width/2, (canvasElm.height / 2) + 110);
   }
+
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+  ctx.fillRect(canvasElm.width/2 - 75, canvasElm.height - 50, 150, 40);
+  ctx.fillStyle = '#FFFFFF';
+  ctx.font = '16px monospace';
+  ctx.textBaseline = 'middle';
+  ctx.textAlign = 'center';
+  ctx.fillText('SCORE: ' + state.ticks, canvasElm.width/2, canvasElm.height - 30);
 }

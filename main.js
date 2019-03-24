@@ -156,6 +156,7 @@ const runLoop = async () => {
   app.startGame();
   await runLoop();
   app.gameOver();
+  state.ticks = 0;
   app.draw();
 
   while(true) {
