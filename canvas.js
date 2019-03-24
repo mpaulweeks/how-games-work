@@ -15,8 +15,7 @@ app.draw = () => {
     minY: canvasElm.height * 2 / 3,
     maxX: canvasElm.width - buffer,
     maxY: canvasElm.height - buffer,
-    enemySpawnX: canvasElm.width + buffer,
-    enemySpawnY: buffer,
+    enemySpawnY: 0 - buffer,
     enemyMinY: buffer,
     enemyMaxY: canvasElm.height / 3,
   });
@@ -41,10 +40,13 @@ app.draw = () => {
     ctx.fillRect(enemy.x - bodySize, enemy.y - bodySize, 2*bodySize, 2*bodySize);
     ctx.strokeRect(enemy.x - bodySize, enemy.y - bodySize, 2*bodySize, 2*bodySize);
   });
-  state.enemyBullets.forEach(eb => {
-    ctx.strokeStyle = eb.color;
+  state.orbs.forEach(orb => {
+    if (!orb.alive){
+      return;
+    }
+    ctx.strokeStyle = orb.color;
     ctx.beginPath();
-    ctx.arc(eb.x, eb.y, 8, 0, 2 * Math.PI, false);
+    ctx.arc(orb.x, orb.y, orb.radius, 0, 2 * Math.PI, false);
     ctx.lineWidth = 4;
     ctx.stroke();
   });

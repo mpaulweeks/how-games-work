@@ -13,13 +13,14 @@ const state = {
   heroPosition: {x: 0, y: 0},
   heroBullet: null,
   enemies: [],
-  enemyBullets: [],
+  orbs: [],
 };
 const constants = {
   buffer: 50,
   bodySize: 25,
-  heroSpeed: 10,
-  bulletSpeed: 40,
+  heroSpeed: 3,
+  orbSpeed: 40,
+  maxOrbs: 50,
   minX: 0,
   minY: 0,
   maxX: 0,
@@ -64,119 +65,98 @@ const functions = [
     code: () => {
       state.enemies.push({
         color: app.randomShadeOfGrey(),
-        x: constants.enemySpawnX,
+        x: Math.random() * constants.canvasWidth,
         y: constants.enemySpawnY,
-        dx: -2,
+        dx: (Math.random() - 0.5) * 2,
         dy: (Math.random() - 0.5) * 2,
       });
     },
   },
   {
-    key: 'moveEnemyShip',
+    key: 'moveEnemy',
     code: (enemy) => {
       enemy.x += enemy.dx;
       enemy.y += enemy.dy;
-      if (enemy.x < constants.minX) {
+      if (enemy.x < constants.minX)
         enemy.dx = Math.abs(enemy.dx);
-      }
-      if (enemy.x > constants.maxX) {
+      if (enemy.x > constants.maxX)
         enemy.dx = 0 - Math.abs(enemy.dx);
-      }
-      if (enemy.y < constants.enemyMinY) {
+      if (enemy.y < constants.enemyMinY)
         enemy.dy = Math.abs(enemy.dy);
-      }
-      if (enemy.y > constants.enemyMaxY) {
+      if (enemy.y > constants.enemyMaxY)
         enemy.dy = 0 - Math.abs(enemy.dy);
-      }
     },
   },
   {
-    key: 'shootEnemyBullet',
+    key: 'shootOrb',
     code: (enemy) => {
-      state.enemyBullets.push({
-        color: enemy.color,
-        x: enemy.x,
-        y: enemy.y,
-      })
+      for (let i = 0; i < state.orbs.length; i++){
+        if (!state.orbs[i].alive){
+          state.orbs[i] = {
+            alive: true,
+            index: i,
+            color: enemy.color,
+            x: enemy.x,
+            y: enemy.y,
+            radius: 5 + Math.floor(Math.random() * 5),
+          };
+          break;
+        }
+      }
     },
   },
   {
-    key: 'checkEnemyHit',
-    code: (body) => {
-      if (!state.heroBullet){
-        return false;
-      }
-      const distance = Math.sqrt(
-        Math.pow(body.x - state.heroBullet.x, 2) +
-        Math.pow(body.y - state.heroBullet.y, 2)
-      );
-      return !!(distance < constants.bodySize);
+    key: 'despawnOrb',
+    code: (orb) => {
+      orb.alive = false;
     },
   },
   {
     key: 'checkHeroHit',
-    code: (bullet) => {
+    code: (orb) => {
       const distance = Math.sqrt(
-        Math.pow(state.heroPosition.x - bullet.x, 2) +
-        Math.pow(state.heroPosition.y - bullet.y, 2)
+        Math.pow(state.heroPosition.x - orb.x, 2) +
+        Math.pow(state.heroPosition.y - orb.y, 2)
       );
-      return !!(distance < constants.bodySize * 0.75);
+      return distance <= orb.radius;
     },
   },
   {
     key: 'runGameLoop',
     output: 'code-loop',
     code: () => {
-      // check keyboard input, perform actions
-      if (keyboard.Space && !state.heroBullet) {
-        app.shootHeroBullet();
-      }
-      if (keyboard.ArrowLeft) {
-        app.moveHeroLeft();
-      }
-      if (keyboard.ArrowRight) {
-        app.moveHeroRight();
-      }
-      if (keyboard.ArrowUp) {
-        app.moveHeroUp();
-      }
-      if (keyboard.ArrowDown) {
-        app.moveHeroDown();
-      }
-
-      // move your bullets
-      if (state.heroBullet) {
-        app.moveHeroBullet();
-      }
-
       // move enemies around
-      state.enemies = state.enemies.filter(e => {
-        app.moveEnemyShip(e);
-        const isDead = (
-          state.heroBullet &&
-          app.checkEnemyHit(e)
-        );
-        if (isDead){
-          app.despawnHeroBullet();
-        } else if (Math.random() < 0.006) {
-          app.shootEnemyBullet(e);
-        }
-        return !isDead;
-      });
-
-      // check for hero being hit
-      state.enemyBullets = state.enemyBullets.filter(eb => {
-        eb.y += 0.1 * constants.bulletSpeed;
-        if (app.checkHeroHit(eb)) {
-          app.gameOver();
-        }
-        return eb.y < constants.canvasHeight;
+      state.enemies.forEach(e => {
+        if (Math.random() < 0.03)
+          app.shootOrb(e);
+        app.moveEnemy(e);
       });
 
       // spawn new enemies every ~300 frames
-      if (Math.random() < 0.003) {
+      if (Math.random() < 0.003)
         app.spawnEnemy();
-      }
+
+      // check keyboard input, perform actions
+      if (keyboard.ArrowLeft)
+        app.moveHeroLeft();
+      if (keyboard.ArrowRight)
+        app.moveHeroRight();
+      if (keyboard.ArrowUp)
+        app.moveHeroUp();
+      if (keyboard.ArrowDown)
+        app.moveHeroDown();
+
+      // check for hero being hit
+      state.orbs.forEach(orb => {
+        if (!orb.alive)
+          return;
+        orb.y += 0.1 * constants.orbSpeed;
+        if (app.checkHeroHit(orb))
+          // app.gameOver();
+          console.log('dead');
+        if (orb.y > constants.canvasHeight + orb.radius)
+          app.despawnOrb(orb);
+      });
 
       // update the canvas
       app.draw();
@@ -190,28 +170,21 @@ const functions = [
       state.heroPosition.y = canvasElm.height - 100;
       state.heroBullet = null;
       state.enemies = [];
-      state.enemyBullets = [];
+      state.orbs = [];
+      for (let i = 0; i < 10; i++){
+        app.spawnEnemy();
+      }
+      for (let i = 0; i < constants.maxOrbs; i++){
+        state.orbs[i] = {
+          alive: false,
+        };
+      }
     },
   },
   {
     key: 'gameOver',
     code: () => {
       state.gameOn = false;
-    },
-  },
-  {
-    key: 'shootHeroBullet',
-    code: () => {
-      state.heroBullet = {
-        x: state.heroPosition.x,
-        y: state.heroPosition.y,
-      };
-    },
-  },
-  {
-    key: 'despawnHeroBullet',
-    code: () => {
-      state.heroBullet = null;
     },
   },
   {
@@ -247,15 +220,6 @@ const functions = [
       state.heroPosition.y += constants.heroSpeed;
       if (state.heroPosition.y > constants.maxY) {
         state.heroPosition.y = constants.maxY;
-      }
-    },
-  },
-  {
-    key: 'moveHeroBullet',
-    code: () => {
-      state.heroBullet.y -= constants.bulletSpeed;
-      if (state.heroBullet.y < 0){
-        app.despawnHeroBullet();
       }
     },
   },
