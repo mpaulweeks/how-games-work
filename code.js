@@ -140,17 +140,6 @@ const functions = [
     code: () => {
       state.ticks += 1;
 
-      // move enemies around
-      state.enemies.forEach(e => {
-        if (state.ticks % e.fireFreq === 0)
-          app.shootOrb(e);
-        app.moveEnemy(e);
-      });
-
-      // spawn new enemies
-      if (state.ticks % constants.spawnFreq === 0)
-        app.spawnEnemy();
-
       // check keyboard input, perform actions
       if (keyboard.ArrowLeft)
         app.moveHeroLeft();
@@ -161,15 +150,26 @@ const functions = [
       if (keyboard.ArrowDown)
         app.moveHeroDown();
 
+      // spawn new enemies
+      if (state.ticks % constants.spawnFreq === 0)
+        app.spawnEnemy();
+
+      // move enemies around
+      state.enemies.forEach(e => {
+        if (state.ticks % e.fireFreq === 0)
+          app.shootOrb(e);
+        app.moveEnemy(e);
+      });
+
       // check for hero being hit
       state.orbs.forEach(orb => {
         if (!orb.alive)
           return;
         orb.y += 0.1 * constants.orbSpeed;
-        if (app.checkHeroHit(orb))
-          app.gameOver();
         if (orb.y > constants.canvasHeight + orb.radius)
           app.despawnOrb(orb);
+        if (app.checkHeroHit(orb))
+          app.gameOver();
       });
 
       // update the canvas
