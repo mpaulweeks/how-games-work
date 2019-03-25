@@ -1,5 +1,7 @@
 # todo
 
+- fix svg covering entire screen
+  - put header over svg
 - move more enemy funcs into obscurity
 - ramp up spawn rate as game goes on
 - add simple hit detection
