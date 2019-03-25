@@ -11,10 +11,8 @@ app.draw = () => {
   Object.assign(constants, {
     canvasWidth: canvasElm.width,
     canvasHeight: canvasElm.height,
-    minX: heroSize,
-    minY: heroSize,
-    maxX: canvasElm.width - heroSize,
-    maxY: canvasElm.height - heroSize,
+    minX: heroSize * 2,
+    maxX: canvasElm.width - (heroSize * 2),
     enemyMinY: buffer,
     enemyMaxY: canvasElm.height / 3,
   });
@@ -23,32 +21,41 @@ app.draw = () => {
   ctx.fillRect(0, 0, canvasElm.width, canvasElm.height);
 
   ctx.fillStyle = 'yellow';
+  ctx.strokeStyle = 'yellow';
+
+  // draw hero base
   ctx.beginPath();
-  ctx.moveTo(state.heroPosition.x - heroSize, state.heroPosition.y + heroSize);
-  ctx.lineTo(state.heroPosition.x, state.heroPosition.y - heroSize);
-  ctx.lineTo(state.heroPosition.x + heroSize, state.heroPosition.y + heroSize);
-  ctx.closePath();
+  ctx.arc(state.shooterBase.x, state.shooterBase.y, heroSize, Math.PI, 2*Math.PI, false);
   ctx.fill();
+  ctx.fillRect(state.shooterBase.x - heroSize, state.shooterBase.y, heroSize * 2, heroSize);
+
+  // draw hero nozzle
+  ctx.lineWidth = constants.nozzleWidth;
+  ctx.beginPath();
+  ctx.moveTo(state.shooterNozzle.x, state.shooterNozzle.y);
+  ctx.lineTo(state.shooterBase.x, state.shooterBase.y);
+  ctx.stroke();
+
+  // draw hero bullet
   if (state.heroBullet){
-    ctx.fillRect(state.heroBullet.x - 2, state.heroBullet.y - 5, 4, 10);
+    ctx.beginPath();
+    ctx.arc(state.heroBullet.x, state.heroBullet.y, constants.nozzleWidth, 0, 2 * Math.PI, false);
+    ctx.fill();
   };
 
   ctx.strokeStyle = '#FFFFFF';
-  state.enemies.forEach(enemy => {
-    ctx.fillStyle = enemy.color;
-    ctx.fillRect(enemy.x - enemySize, enemy.y - enemySize, 2*enemySize, 2*enemySize);
-    ctx.strokeRect(enemy.x - enemySize, enemy.y - enemySize, 2*enemySize, 2*enemySize);
+  state.walls.forEach(wall => {
+    ctx.fillStyle = 'gray';
+    ctx.fillRect(wall.start.x, wall.start.y, wall.width, wall.height);
   });
-  state.orbs.forEach(orb => {
-    if (!orb.alive){
-      return;
-    }
-    ctx.strokeStyle = orb.color;
+
+  for (let i = 0; i < 3; i++){
+    ctx.fillStyle = i % 2 === 0 ? 'red' : 'white';
+    const radius = state.target.radius * (1 - (0.3 * i));
     ctx.beginPath();
-    ctx.arc(orb.x, orb.y, orb.radius, 0, 2 * Math.PI, false);
-    ctx.lineWidth = 4;
-    ctx.stroke();
-  });
+    ctx.arc(state.target.x, state.target.y, radius, 0, 2 * Math.PI, false);
+    ctx.fill();
+  }
 
   if (!state.gameOn) {
     ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
@@ -63,12 +70,4 @@ app.draw = () => {
     ctx.fillText('use ARROW KEYS to move', canvasElm.width/2, (canvasElm.height / 2) + 80);
     ctx.fillText('press SPACE to shoot', canvasElm.width/2, (canvasElm.height / 2) + 110);
   }
-
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-  ctx.fillRect(canvasElm.width/2 - 75, canvasElm.height - 50, 150, 40);
-  ctx.fillStyle = '#FFFFFF';
-  ctx.font = '16px monospace';
-  ctx.textBaseline = 'middle';
-  ctx.textAlign = 'center';
-  ctx.fillText('SCORE: ' + state.ticks, canvasElm.width/2, canvasElm.height - 30);
 }

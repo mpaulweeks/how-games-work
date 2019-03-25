@@ -10,25 +10,28 @@ const app = {
 const keyboard = {};
 const state = {
   gameOn: false,
-  heroPosition: {x: 0, y: 0},
+  shooterBase: {x: 0, y: 0},
+  shooterNozzle: {x: 0, y: 0},
+  shooterAngle: Math.PI / 2,
   heroBullet: null,
-  enemies: [],
-  orbs: [],
+  target: {x: 0, y: 0, radius: 0},
+  level: 0,
+  walls: [],
 };
 const constants = {
-  spawnFreq: 300,
-  buffer: 50,
-  enemySize: 25,
-  heroSize: 10,
+  heroSize: 20,
   heroSpeed: 5,
-  orbSpeed: 100,
-  maxOrbs: 50,
-  orbMinRadius: 30,
-  orbMaxRadius: 50,
+  bulletSpeed: 10,
   minX: 0,
   minY: 0,
   maxX: 0,
   maxY: 0,
+  nozzleLength: 40,
+  nozzleSpeed: 0.05,
+  nozzleWidth: 6,
+  barrierWidth: 20,
+  maxAngle: Math.PI - 0.2,
+  minAngle: 0.2,
 };
 
 const functions = [
@@ -65,73 +68,71 @@ const functions = [
     },
   },
   {
-    key: 'spawnEnemy',
+    key: 'shootBullet',
     code: () => {
-      state.enemies.push({
-        fireFreq: 30 + Math.floor(30 * Math.random()),
-        color: app.randomShadeOfGrey(),
-        x: Math.random() * constants.canvasWidth,
-        y: 0 - constants.enemySize,
-        dx: (Math.random() - 0.5) * 2,
-        dy: (Math.random() - 0.5) * 2,
-      });
+      const noz = state.shooterNozzle;
+      const base = state.shooterBase;
+      state.heroBullet = {
+        x: noz.x,
+        y: noz.y,
+        dx: (noz.x - base.x) * constants.bulletSpeed / constants.nozzleLength,
+        dy: (noz.y - base.y) * constants.bulletSpeed / constants.nozzleLength,
+      };
     },
   },
   {
-    key: 'moveEnemy',
-    hidePrint: true,
-    code: (enemy) => {
-      enemy.x += enemy.dx;
-      enemy.y += enemy.dy;
-      if (enemy.x < constants.minX)
-        enemy.dx = Math.abs(enemy.dx);
-      if (enemy.x > constants.maxX)
-        enemy.dx = 0 - Math.abs(enemy.dx);
-      if (enemy.y < constants.enemyMinY)
-        enemy.dy = Math.abs(enemy.dy);
-      if (enemy.y > constants.enemyMaxY)
-        enemy.dy = 0 - Math.abs(enemy.dy);
+    key: 'despawnBullet',
+    code: () => {
+      state.heroBullet = null;
     },
   },
   {
-    key: 'shootOrb',
-    code: (enemy) => {
-      for (let i = 0; i < state.orbs.length; i++){
-        if (!state.orbs[i].alive){
-          state.orbs[i] = {
-            alive: true,
-            index: i,
-            color: enemy.color,
-            x: enemy.x,
-            y: enemy.y,
-            radius: (
-              constants.orbMinRadius +
-              Math.floor(
-                Math.random() *
-                (constants.orbMaxRadius - constants.orbMinRadius)
-              )
-            ),
-          };
-          break;
+    key: 'checkTargetHit',
+    code: () => {
+      const distance = Math.sqrt(
+        Math.pow(state.heroBullet.x - state.target.x, 2) +
+        Math.pow(state.heroBullet.y - state.target.y, 2)
+      );
+      if (distance <= state.target.radius) {
+        app.gameOver();
+      }
+    },
+  },
+  {
+    key: 'checkWallHit',
+    code: (wall) => {
+      const bullet = state.heroBullet;
+      const isHit = (
+        wall.start.x < bullet.x &&
+        wall.start.x + wall.width > bullet.x &&
+        wall.start.y < bullet.y &&
+        wall.start.y + wall.height > bullet.y
+      );
+      if (isHit) {
+        // move backwards
+        bullet.x -= bullet.dx;
+        bullet.y -= bullet.dy;
+
+        if (wall.width > wall.height) {
+          bullet.dy *= -1;
+        } else {
+          bullet.dx *= -1;
         }
       }
     },
   },
   {
-    key: 'despawnOrb',
-    code: (orb) => {
-      orb.alive = false;
-    },
-  },
-  {
-    key: 'checkHeroHit',
-    hidePrint: true,
-    code: (orb) => {
-      const distance = Math.sqrt(
-        Math.pow(state.heroPosition.x - orb.x, 2) +
-        Math.pow(state.heroPosition.y - orb.y, 2)
+    key: 'checkBulletDespawn',
+    code: () => {
+      let outOfBounds = (
+        state.heroBullet.x < 0 ||
+        state.heroBullet.x > constants.canvasWidth ||
+        state.heroBullet.y < 0 ||
+        state.heroBullet.y > constants.canvasHeight
       );
-      return distance <= orb.radius;
+      if (outOfBounds){
+        app.despawnBullet();
+      }
     },
   },
   {
@@ -141,36 +142,36 @@ const functions = [
       state.ticks += 1;
 
       // check keyboard input, perform actions
+      if (keyboard.Space && !state.heroBullet)
+        app.shootBullet();
       if (keyboard.ArrowLeft)
         app.moveHeroLeft();
       if (keyboard.ArrowRight)
         app.moveHeroRight();
       if (keyboard.ArrowUp)
-        app.moveHeroUp();
+        app.angleHeroLeft();
       if (keyboard.ArrowDown)
-        app.moveHeroDown();
+        app.angleHeroRight();
 
-      // spawn new enemies
-      if (state.ticks % constants.spawnFreq === 0)
-        app.spawnEnemy();
+      if (state.heroBullet) {
+        state.heroBullet.x += state.heroBullet.dx;
+        state.heroBullet.y += state.heroBullet.dy;
 
-      // move enemies around
-      state.enemies.forEach(e => {
-        if (state.ticks % e.fireFreq === 0)
-          app.shootOrb(e);
-        app.moveEnemy(e);
-      });
+        app.checkTargetHit();
+        state.walls.forEach(wall => {
+          app.checkWallHit(wall);
+        });
 
-      // check for hero being hit
-      state.orbs.forEach(orb => {
-        if (!orb.alive)
-          return;
-        orb.y += 0.1 * constants.orbSpeed;
-        if (orb.y > constants.canvasHeight + orb.radius)
-          app.despawnOrb(orb);
-        if (app.checkHeroHit(orb))
-          app.gameOver();
-      });
+        let outOfBounds = (
+          state.heroBullet.x < 0 ||
+          state.heroBullet.x > constants.canvasWidth ||
+          state.heroBullet.y < 0 ||
+          state.heroBullet.y > constants.canvasHeight
+        );
+        if (outOfBounds){
+          app.despawnBullet();
+        }
+      }
 
       // update the canvas
       app.draw();
@@ -181,16 +182,30 @@ const functions = [
     code: () => {
       state.gameOn = true;
       state.ticks = 0;
-      state.heroPosition.x = canvasElm.width / 2;
-      state.heroPosition.y = canvasElm.height - 100;
+
+      state.shooterBase.x = canvasElm.width / 2;
+      state.shooterBase.y = canvasElm.height - constants.heroSize;
+      state.shooterAngle = Math.PI / 2;
+      app.calcNozzlePosition();
+
       state.heroBullet = null;
-      state.enemies = [];
-      state.orbs = [];
-      for (let i = 0; i < constants.maxOrbs; i++){
-        state.orbs[i] = {
-          alive: false,
-        };
-      }
+      state.target = {
+        x: constants.canvasWidth / 2,
+        y: 100,
+        radius: 50,
+      };
+      state.walls = [
+        {
+          start: {x: 0, y: 0},
+          width: constants.barrierWidth,
+          height: constants.canvasHeight,
+        },
+        {
+          start: {x: constants.canvasWidth - constants.barrierWidth, y: 0},
+          width: constants.barrierWidth,
+          height: constants.canvasHeight,
+        },
+      ];
     },
   },
   {
@@ -200,39 +215,55 @@ const functions = [
     },
   },
   {
+    key: 'calcNozzlePosition',
+    code: () => {
+      const base = state.shooterBase;
+      const angle = state.shooterAngle;
+      const length = constants.nozzleLength;
+      state.shooterNozzle = {
+        x: base.x + (Math.cos(angle) * length),
+        y: base.y - (Math.sin(angle) * length),
+      };
+    },
+  },
+  {
     key: 'moveHeroLeft',
     code: () => {
-      state.heroPosition.x -= constants.heroSpeed;
-      if (state.heroPosition.x < constants.minX) {
-        state.heroPosition.x = constants.minX;
+      state.shooterBase.x -= constants.heroSpeed;
+      if (state.shooterBase.x < constants.minX) {
+        state.shooterBase.x = constants.minX;
       }
+      app.calcNozzlePosition();
     },
   },
   {
     key: 'moveHeroRight',
     code: () => {
-      state.heroPosition.x += constants.heroSpeed;
-      if (state.heroPosition.x > constants.maxX) {
-        state.heroPosition.x = constants.maxX;
+      state.shooterBase.x += constants.heroSpeed;
+      if (state.shooterBase.x > constants.maxX) {
+        state.shooterBase.x = constants.maxX;
       }
+      app.calcNozzlePosition();
     },
   },
   {
-    key: 'moveHeroUp',
+    key: 'angleHeroLeft',
     code: () => {
-      state.heroPosition.y -= constants.heroSpeed;
-      if (state.heroPosition.y < constants.minY) {
-        state.heroPosition.y = constants.minY;
+      state.shooterAngle += constants.nozzleSpeed;
+      if (state.shooterAngle > constants.maxAngle) {
+        state.shooterAngle = constants.maxAngle;
       }
+      app.calcNozzlePosition();
     },
   },
   {
-    key: 'moveHeroDown',
+    key: 'angleHeroRight',
     code: () => {
-      state.heroPosition.y += constants.heroSpeed;
-      if (state.heroPosition.y > constants.maxY) {
-        state.heroPosition.y = constants.maxY;
+      state.shooterAngle -= constants.nozzleSpeed;
+      if (state.shooterAngle < constants.minAngle) {
+        state.shooterAngle = constants.minAngle;
       }
+      app.calcNozzlePosition();
     },
   },
 ].map(func => ({
