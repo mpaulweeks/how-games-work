@@ -1,14 +1,6 @@
 # todo
 
-- fix svg covering entire screen
-  - put header over svg
-- move more enemy funcs into obscurity
-- ramp up spawn rate as game goes on
-- add simple hit detection
-- make enemies spawn as random colors
-- start hero in bottom/middle
-- enemies array
-  - move enemies
-  - check for collisions
+- fix bug with func pointers when multiple callers
+- add more levels
 - more colors
   - https://www.tableau.com/about/blog/2016/7/colors-upgrade-tableau-10-56782
