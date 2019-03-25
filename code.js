@@ -13,7 +13,7 @@ const state = {
   shooterBase: {x: 0, y: 0},
   shooterNozzle: {x: 0, y: 0},
   shooterAngle: Math.PI / 2,
-  heroBullet: null,
+  pellet: null,
   target: {x: 0, y: 0, radius: 0},
   level: 0,
   walls: [],
@@ -68,70 +68,60 @@ const functions = [
     },
   },
   {
-    key: 'shootBullet',
-    code: () => {
-      const noz = state.shooterNozzle;
-      const base = state.shooterBase;
-      state.heroBullet = {
-        x: noz.x,
-        y: noz.y,
-        dx: (noz.x - base.x) * constants.bulletSpeed / constants.nozzleLength,
-        dy: (noz.y - base.y) * constants.bulletSpeed / constants.nozzleLength,
+    key: 'shootPellet',
+    code: (nozzle) => {
+      state.pellet = {
+        x: nozzle.x,
+        y: nozzle.y,
+        dx: nozzle.dx,
+        dy: nozzle.dy,
       };
     },
   },
   {
-    key: 'despawnBullet',
+    key: 'despawnPellet',
     code: () => {
-      state.heroBullet = null;
+      state.pellet = null;
     },
   },
   {
     key: 'checkTargetHit',
-    code: () => {
+    code: (pellet, target) => {
       const distance = Math.sqrt(
-        Math.pow(state.heroBullet.x - state.target.x, 2) +
-        Math.pow(state.heroBullet.y - state.target.y, 2)
+        Math.pow(pellet.x - target.x, 2) +
+        Math.pow(pellet.y - target.y, 2)
       );
-      if (distance <= state.target.radius) {
+      if (distance <= target.radius) {
         app.gameOver();
       }
     },
   },
   {
-    key: 'checkWallHit',
-    code: (wall) => {
-      const bullet = state.heroBullet;
-      const isHit = (
-        wall.start.x < bullet.x &&
-        wall.start.x + wall.width > bullet.x &&
-        wall.start.y < bullet.y &&
-        wall.start.y + wall.height > bullet.y
-      );
-      if (isHit) {
-        // move backwards
-        bullet.x -= bullet.dx;
-        bullet.y -= bullet.dy;
+    key: 'bounceOffWall',
+    code: (pellet, wall) => {
+      // move backwards to get out of wall
+      pellet.x -= pellet.dx;
+      pellet.y -= pellet.dy;
 
-        if (wall.width > wall.height) {
-          bullet.dy *= -1;
-        } else {
-          bullet.dx *= -1;
-        }
+      // reverse direction depending on wall type
+      if (wall.width > wall.height) {
+        pellet.dy *= -1;
+      } else {
+        pellet.dx *= -1;
       }
     },
   },
   {
-    key: 'checkBulletDespawn',
-    code: () => {
-      let outOfBounds = (
-        state.heroBullet.x < 0 ||
-        state.heroBullet.x > constants.canvasWidth ||
-        state.heroBullet.y < 0 ||
-        state.heroBullet.y > constants.canvasHeight
+    key: 'checkWallHit',
+    code: (pellet, wall) => {
+      const isHit = (
+        wall.start.x < pellet.x &&
+        wall.start.x + wall.width > pellet.x &&
+        wall.start.y < pellet.y &&
+        wall.start.y + wall.height > pellet.y
       );
-      if (outOfBounds){
-        app.despawnBullet();
+      if (isHit) {
+        app.bounceOffWall(pellet, wall);
       }
     },
   },
@@ -142,8 +132,8 @@ const functions = [
       state.ticks += 1;
 
       // check keyboard input, perform actions
-      if (keyboard.Space && !state.heroBullet)
-        app.shootBullet();
+      if (keyboard.Space && !state.pellet)
+        app.shootPellet(state.shooterNozzle);
       if (keyboard.ArrowLeft)
         app.moveHeroLeft();
       if (keyboard.ArrowRight)
@@ -153,23 +143,24 @@ const functions = [
       if (keyboard.ArrowDown)
         app.angleHeroRight();
 
-      if (state.heroBullet) {
-        state.heroBullet.x += state.heroBullet.dx;
-        state.heroBullet.y += state.heroBullet.dy;
+      if (state.pellet) {
+        const pellet = state.pellet;
+        pellet.x += pellet.dx;
+        pellet.y += pellet.dy;
 
-        app.checkTargetHit();
         state.walls.forEach(wall => {
-          app.checkWallHit(wall);
+          app.checkWallHit(pellet, wall);
         });
+        app.checkTargetHit(pellet, state.target);
 
         let outOfBounds = (
-          state.heroBullet.x < 0 ||
-          state.heroBullet.x > constants.canvasWidth ||
-          state.heroBullet.y < 0 ||
-          state.heroBullet.y > constants.canvasHeight
+          pellet.x < 0 ||
+          pellet.x > constants.canvasWidth ||
+          pellet.y < 0 ||
+          pellet.y > constants.canvasHeight
         );
         if (outOfBounds){
-          app.despawnBullet();
+          app.despawnPellet();
         }
       }
 
@@ -188,7 +179,7 @@ const functions = [
       state.shooterAngle = Math.PI / 2;
       app.calcNozzlePosition();
 
-      state.heroBullet = null;
+      state.pellet = null;
       state.target = {
         x: constants.canvasWidth / 2,
         y: 100,
@@ -220,9 +211,13 @@ const functions = [
       const base = state.shooterBase;
       const angle = state.shooterAngle;
       const length = constants.nozzleLength;
+      const angleX = Math.cos(angle);
+      const angleY = Math.sin(angle);
       state.shooterNozzle = {
-        x: base.x + (Math.cos(angle) * length),
-        y: base.y - (Math.sin(angle) * length),
+        x: base.x + (angleX * length),
+        y: base.y - (angleY * length),
+        dx: angleX * constants.bulletSpeed,
+        dy: angleY * constants.bulletSpeed * -1,
       };
     },
   },

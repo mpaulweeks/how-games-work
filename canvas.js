@@ -37,9 +37,9 @@ app.draw = () => {
   ctx.stroke();
 
   // draw hero bullet
-  if (state.heroBullet){
+  if (state.pellet){
     ctx.beginPath();
-    ctx.arc(state.heroBullet.x, state.heroBullet.y, constants.nozzleWidth, 0, 2 * Math.PI, false);
+    ctx.arc(state.pellet.x, state.pellet.y, constants.nozzleWidth, 0, 2 * Math.PI, false);
     ctx.fill();
   };
 
