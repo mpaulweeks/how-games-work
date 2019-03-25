@@ -23,51 +23,54 @@ app.draw = () => {
   ctx.fillStyle = 'yellow';
   ctx.strokeStyle = 'yellow';
 
+  const { shooterBase, shooterNozzle, pellet } = state;
+  const { target, walls } = state.levelData;
+
   // draw hero base
   ctx.beginPath();
-  ctx.arc(state.shooterBase.x, state.shooterBase.y, heroSize, Math.PI, 2*Math.PI, false);
+  ctx.arc(shooterBase.x, shooterBase.y, heroSize, Math.PI, 2*Math.PI, false);
   ctx.fill();
-  ctx.fillRect(state.shooterBase.x - heroSize, state.shooterBase.y, heroSize * 2, heroSize);
+  ctx.fillRect(shooterBase.x - heroSize, shooterBase.y, heroSize * 2, heroSize);
 
   // draw hero nozzle
   ctx.lineWidth = constants.nozzleWidth;
   ctx.beginPath();
-  ctx.moveTo(state.shooterNozzle.x, state.shooterNozzle.y);
-  ctx.lineTo(state.shooterBase.x, state.shooterBase.y);
+  ctx.moveTo(shooterNozzle.x, shooterNozzle.y);
+  ctx.lineTo(shooterBase.x, shooterBase.y);
   ctx.stroke();
 
   // draw hero bullet
-  if (state.pellet){
+  if (pellet){
     ctx.beginPath();
-    ctx.arc(state.pellet.x, state.pellet.y, constants.nozzleWidth, 0, 2 * Math.PI, false);
+    ctx.arc(pellet.x, pellet.y, constants.nozzleWidth, 0, 2 * Math.PI, false);
     ctx.fill();
   };
 
   ctx.strokeStyle = '#FFFFFF';
-  state.walls.forEach(wall => {
+  walls.forEach(wall => {
     ctx.fillStyle = 'gray';
     ctx.fillRect(wall.start.x, wall.start.y, wall.width, wall.height);
   });
 
   for (let i = 0; i < 3; i++){
     ctx.fillStyle = i % 2 === 0 ? 'red' : 'white';
-    const radius = state.target.radius * (1 - (0.3 * i));
+    const radius = target.radius * (1 - (0.3 * i));
     ctx.beginPath();
-    ctx.arc(state.target.x, state.target.y, radius, 0, 2 * Math.PI, false);
+    ctx.arc(target.x, target.y, radius, 0, 2 * Math.PI, false);
     ctx.fill();
   }
 
-  if (!state.gameOn) {
+  if (state.levelComplete) {
     ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
     ctx.fillRect(0, 0, canvasElm.width, canvasElm.height);
     ctx.fillStyle = '#FFFFFF';
     ctx.font = '40px monospace';
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'center';
-    ctx.fillText('GAME OVER', canvasElm.width/2, (canvasElm.height / 2) - 50);
+    ctx.fillText(state.levelData.title, canvasElm.width/2, (canvasElm.height / 2) - 50);
     ctx.font = '20px monospace';
-    ctx.fillText('press ENTER to start', canvasElm.width/2, (canvasElm.height / 2) + 50);
-    ctx.fillText('use ARROW KEYS to move', canvasElm.width/2, (canvasElm.height / 2) + 80);
-    ctx.fillText('press SPACE to shoot', canvasElm.width/2, (canvasElm.height / 2) + 110);
+    state.levelData.subtitles.forEach((subtitle, index) => {
+      ctx.fillText(subtitle, canvasElm.width/2, (canvasElm.height / 2) + 50 + (30*index));
+    });
   }
 }

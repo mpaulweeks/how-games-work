@@ -128,9 +128,7 @@ const runLoop = async () => {
   // run code, maybe show some code blocks
   // printState();
   // printKeyboard();
-  if (state.gameOn){
-    app.runGameLoop();
-  }
+  app.runGameLoop();
   toPrint.forEach(printFunc);
   toPrint = [];
   printHighlights();
@@ -151,13 +149,8 @@ const runLoop = async () => {
   // app.onKeyUp({code: null});
 
   // init ship at bottom
-  app.startGame();
-  await runLoop();
-  app.startGame();
-  await runLoop();
-  app.gameOver();
-  state.ticks = 0;
-  app.draw();
+  app.loadLevel();
+  state.levelComplete = true;
 
   while(true) {
     await runLoop();

@@ -9,13 +9,13 @@ const app = {
 };
 const keyboard = {};
 const state = {
-  gameOn: false,
+  levelComplete: true,
+  levelData: {index: -1},
   shooterBase: {x: 0, y: 0},
   shooterNozzle: {x: 0, y: 0},
   shooterAngle: Math.PI / 2,
   pellet: null,
   target: {x: 0, y: 0, radius: 0},
-  level: 0,
   walls: [],
 };
 const constants = {
@@ -34,24 +34,114 @@ const constants = {
   minAngle: 0.2,
 };
 
+const getLevelData = () => {
+  const c = constants;
+  const defaultWalls = [
+    {
+      start: {x: 0, y: 0},
+      width: c.barrierWidth,
+      height: c.canvasHeight,
+    },
+    {
+      start: {x: c.canvasWidth - c.barrierWidth, y: 0},
+      width: c.barrierWidth,
+      height: c.canvasHeight,
+    },
+  ];
+  return [
+    {
+      title: 'TRICKSHOT',
+      subtitles: [
+        'press SPACE to shoot',
+        'you can only have one pellet at a time',
+        '',
+        'press ENTER to start',
+      ],
+      target: {
+        x: -500,
+        y: -500,
+        radius: 50,
+      },
+      walls: defaultWalls,
+    },
+    {
+      title: 'LEVEL COMPLETE',
+      subtitles: [
+        'press LEFT / RIGHT arrow to move',
+        'lineup your shoot to hit the target!',
+        '',
+        'press ENTER to proceed',
+      ],
+      target: {
+        x: c.canvasWidth / 2,
+        y: 100,
+        radius: 50,
+      },
+      walls: defaultWalls,
+    },
+    {
+      title: 'LEVEL COMPLETE',
+      subtitles: [
+        'press UP / DOWN arrow to aim',
+        'you can ricochet your shots off walls!',
+        '',
+        'press ENTER to proceed',
+      ],
+      target: {
+        x: c.canvasWidth * 3 / 4,
+        y: 100,
+        radius: 50,
+      },
+      walls: defaultWalls,
+    },
+    {
+      title: 'LEVEL COMPLETE',
+      subtitles: [
+        'you win!',
+        'more levels coming soon',
+        '',
+        'press ENTER to restart',
+      ],
+      target: {
+        x: c.canvasWidth / 4,
+        y: 100,
+        radius: 50,
+      },
+      walls: [
+        {
+          start: {x: 0, y: c.canvasHeight / 2},
+          width: c.barrierWidth,
+          height: c.canvasHeight,
+        },
+        {
+          start: {x: c.canvasWidth - c.barrierWidth, y: 0},
+          width: c.barrierWidth,
+          height: c.canvasHeight,
+        },
+        {
+          start: {x: 0, y: c.canvasHeight / 2},
+          width: c.canvasWidth*2/3,
+          height: c.barrierWidth,
+        },
+      ],
+    },
+  ].map((data, index) => ({
+    ...data,
+    index,
+  }));
+};
+
 const functions = [
   {
     key: 'onKeyDown',
     hidePrint: true,
     output: 'code-keydown',
     code: (evt) => {
-      if (evt.code === 'Enter'){
-        if (!state.gameOn){
-          app.startGame();
-        }
-      } else if (evt.code === 'Escape') {
-        app.gameOver();
-        app.draw();
-      } else if (evt.code === 'KeyQ') {
-        app.spawnEnemy();
-      } else if (state.gameOn) {
-        keyboard[evt.code] = true;
+      if (evt.code === 'KeyQ') {
+        app.completeLevel();
+        return;
       }
+      keyboard[evt.code] = true;
       if (evt.code === 'Space' || evt.code.includes('Arrow')){
         evt.preventDefault();
       }
@@ -92,7 +182,8 @@ const functions = [
         Math.pow(pellet.y - target.y, 2)
       );
       if (distance <= target.radius) {
-        app.gameOver();
+        app.despawnPellet();
+        app.completeLevel();
       }
     },
   },
@@ -109,6 +200,10 @@ const functions = [
       } else {
         pellet.dx *= -1;
       }
+
+      // move twice to clear the wall
+      pellet.x += 2 * pellet.dx;
+      pellet.y += 2 * pellet.dy;
     },
   },
   {
@@ -142,16 +237,18 @@ const functions = [
         app.angleHeroLeft();
       if (keyboard.ArrowDown)
         app.angleHeroRight();
+      if (keyboard.Enter && state.levelComplete)
+        app.loadLevel();
 
       if (state.pellet) {
         const pellet = state.pellet;
         pellet.x += pellet.dx;
         pellet.y += pellet.dy;
 
-        state.walls.forEach(wall => {
+        state.levelData.walls.forEach(wall => {
           app.checkWallHit(pellet, wall);
         });
-        app.checkTargetHit(pellet, state.target);
+        app.checkTargetHit(pellet, state.levelData.target);
 
         let outOfBounds = (
           pellet.x < 0 ||
@@ -169,40 +266,29 @@ const functions = [
     },
   },
   {
-    key: 'startGame',
+    key: 'loadLevel',
     code: () => {
-      state.gameOn = true;
+      state.levelComplete = false;
       state.ticks = 0;
 
       state.shooterBase.x = canvasElm.width / 2;
       state.shooterBase.y = canvasElm.height - constants.heroSize;
       state.shooterAngle = Math.PI / 2;
       app.calcNozzlePosition();
-
       state.pellet = null;
-      state.target = {
-        x: constants.canvasWidth / 2,
-        y: 100,
-        radius: 50,
-      };
-      state.walls = [
-        {
-          start: {x: 0, y: 0},
-          width: constants.barrierWidth,
-          height: constants.canvasHeight,
-        },
-        {
-          start: {x: constants.canvasWidth - constants.barrierWidth, y: 0},
-          width: constants.barrierWidth,
-          height: constants.canvasHeight,
-        },
-      ];
+
+      const allLevels = getLevelData();
+      let nextLevelIndex = state.levelData.index + 1;
+      if (nextLevelIndex >= allLevels.length) {
+        nextLevelIndex = 1;
+      }
+      state.levelData = allLevels[nextLevelIndex];
     },
   },
   {
-    key: 'gameOver',
+    key: 'completeLevel',
     code: () => {
-      state.gameOn = false;
+      state.levelComplete = true;
     },
   },
   {
