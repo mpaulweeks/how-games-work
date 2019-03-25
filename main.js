@@ -1,4 +1,6 @@
+// todo consolidate, better naming
 const domLookup = {};
+const pointerLinks = {};
 
 const nextColor = (() => {
   let current = 0;
@@ -8,8 +10,7 @@ const nextColor = (() => {
   };
 })();
 
-// todo make this a smarter lookup
-const allLines = [];
+const callStack = [];
 let pendingHighlights = [];
 let toPrint = [];
 
@@ -36,7 +37,6 @@ const printFunc = func => {
       lineElm.innerHTML = line;
 
       codeElm.appendChild(lineElm);
-      allLines.push(lineElm);
     });
   }
 
@@ -56,36 +56,43 @@ const printFunc = func => {
     }
     codeElm.setAttribute('data-color', func.highlight);
     pointerElm.setAttribute('data-color', func.highlight);
-    pendingHighlights.push(func);
   }
 }
 const printHighlights = () => {
-  allLines.forEach(line => {
-    pendingHighlights.forEach(func => {
-      if (!line.innerHTML.includes('=&gt;') && line.innerHTML.includes(func.key)){
-        line.setAttribute('data-color', func.highlight);
+  pendingHighlights.forEach(highlight => {
+    const { parent, child } = highlight;
+    const { codeElm } = domLookup[parent.key];
+    Array.from(codeElm.children).forEach(line => {
+      if (line.innerHTML.includes(child.key)){
+        line.setAttribute('data-color', child.highlight);
         line.classList.add('highlight');
+        connectPointer(line, child);
       }
     });
   });
   pendingHighlights = [];
-}
-const printPointers = () => {
-  allLines.forEach(line => {
-    Object.keys(domLookup).forEach(funcKey => {
-      if (!line.innerHTML.includes('=&gt;') && line.innerHTML.includes(funcKey)){
-        const { codeElm, pointerElm } = domLookup[funcKey];
-        const lineRect = line.getBoundingClientRect();
-        // todo must be better way than pointing from halfway thru line
-        pointerElm.setAttribute('x1', lineRect.x + lineRect.width/2);
-        pointerElm.setAttribute('y1', lineRect.bottom);
-        const funcRect = codeElm.getBoundingClientRect();
-        pointerElm.setAttribute('x2', funcRect.left);
-        pointerElm.setAttribute('y2', funcRect.top);
-      }
-    });
+};
+const connectPointer = (line, func) => {
+  // todo must be better way than pointing from halfway thru line
+  const { pointerElm, codeElm } = domLookup[func.key];
+  pointerLinks[func.key] = {
+    line,
+    pointerElm,
+    codeElm,
+  };
+};
+const updatePointers = () => {
+  Object.keys(pointerLinks).forEach(pointerLinkKey => {
+    // todo must be better way than pointing from halfway thru line
+    const { pointerElm, line, codeElm } = pointerLinks[pointerLinkKey];
+    const lineRect = line.getBoundingClientRect();
+    pointerElm.setAttribute('x1', lineRect.x + lineRect.width/2);
+    pointerElm.setAttribute('y1', lineRect.bottom);
+    const funcRect = codeElm.getBoundingClientRect();
+    pointerElm.setAttribute('x2', funcRect.left);
+    pointerElm.setAttribute('y2', funcRect.top);
   });
-}
+};
 const printState = () => {
   document.getElementById('code-state').innerHTML = (
     JSON.stringify(state, Object.keys(state).sort().concat('x', 'y'), 2)
@@ -103,7 +110,19 @@ functions.forEach(func => {
     if (!func.hidePrint){
       toPrint.push(func);
     }
-    return func.code(...args);
+    const parent = callStack.pop();
+    if (parent && !parent.hidePrint){
+      pendingHighlights.push({
+        parent: parent,
+        child: func,
+      });
+      callStack.push(parent);
+    }
+
+    callStack.push(func)
+    const result = func.code(...args);
+    callStack.pop();
+    return result;
   };
 });
 
@@ -132,7 +151,7 @@ const runLoop = async () => {
   toPrint.forEach(printFunc);
   toPrint = [];
   printHighlights();
-  printPointers();
+  updatePointers();
 
   // return promise that will wait for next frame
   return new Promise((resolve, reject) => {
