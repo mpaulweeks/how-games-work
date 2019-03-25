@@ -150,7 +150,7 @@ const runLoop = async () => {
 
   // init ship at bottom
   app.loadLevel();
-  state.levelComplete = true;
+  state.complete = true;
 
   while(true) {
     await runLoop();

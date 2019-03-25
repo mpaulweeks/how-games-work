@@ -9,8 +9,8 @@ const app = {
 };
 const keyboard = {};
 const state = {
-  levelComplete: true,
-  levelData: {index: -1},
+  complete: true,
+  level: {index: -1},
   shooterBase: {x: 0, y: 0},
   shooterNozzle: {x: 0, y: 0},
   shooterAngle: Math.PI / 2,
@@ -237,7 +237,7 @@ const functions = [
         app.angleHeroLeft();
       if (keyboard.ArrowDown)
         app.angleHeroRight();
-      if (keyboard.Enter && state.levelComplete)
+      if (keyboard.Enter && state.complete)
         app.loadLevel();
 
       if (state.pellet) {
@@ -245,10 +245,10 @@ const functions = [
         pellet.x += pellet.dx;
         pellet.y += pellet.dy;
 
-        state.levelData.walls.forEach(wall => {
+        state.level.walls.forEach(wall => {
           app.checkWallHit(pellet, wall);
         });
-        app.checkTargetHit(pellet, state.levelData.target);
+        app.checkTargetHit(pellet, state.level.target);
 
         let outOfBounds = (
           pellet.x < 0 ||
@@ -268,7 +268,7 @@ const functions = [
   {
     key: 'loadLevel',
     code: () => {
-      state.levelComplete = false;
+      state.complete = false;
       state.ticks = 0;
 
       state.shooterBase.x = canvasElm.width / 2;
@@ -278,17 +278,17 @@ const functions = [
       state.pellet = null;
 
       const allLevels = getLevelData();
-      let nextLevelIndex = state.levelData.index + 1;
+      let nextLevelIndex = state.level.index + 1;
       if (nextLevelIndex >= allLevels.length) {
         nextLevelIndex = 1;
       }
-      state.levelData = allLevels[nextLevelIndex];
+      state.level = allLevels[nextLevelIndex];
     },
   },
   {
     key: 'completeLevel',
     code: () => {
-      state.levelComplete = true;
+      state.complete = true;
     },
   },
   {
