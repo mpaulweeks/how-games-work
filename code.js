@@ -60,7 +60,7 @@ const getLevelData = () => {
       target: {
         x: -500,
         y: -500,
-        radius: 50,
+        radius: c.canvasWidth/10,
       },
       walls: defaultWalls,
     },
@@ -74,8 +74,8 @@ const getLevelData = () => {
       ],
       target: {
         x: c.canvasWidth / 2,
-        y: 100,
-        radius: 50,
+        y: c.canvasWidth*2/10,
+        radius: c.canvasWidth/10,
       },
       walls: defaultWalls,
     },
@@ -89,23 +89,23 @@ const getLevelData = () => {
       ],
       target: {
         x: c.canvasWidth * 3 / 4,
-        y: 100,
-        radius: 50,
+        y: c.canvasWidth*2/10,
+        radius: c.canvasWidth/10,
       },
       walls: defaultWalls,
     },
     {
       title: 'LEVEL COMPLETE',
       subtitles: [
-        'you win!',
-        'more levels coming soon',
+        'avoid the yellow walls',
+        'they absorb your pellet',
         '',
-        'press ENTER to restart',
+        'press ENTER to proceed',
       ],
       target: {
         x: c.canvasWidth / 4,
-        y: 100,
-        radius: 50,
+        y: c.canvasWidth*2/10,
+        radius: c.canvasWidth/10,
       },
       walls: [
         {
@@ -122,6 +122,104 @@ const getLevelData = () => {
           start: {x: 0, y: c.canvasHeight / 2},
           width: c.canvasWidth*2/3,
           height: c.barrierWidth,
+        },
+      ],
+    },
+    {
+      title: 'LEVEL COMPLETE',
+      subtitles: [
+        'now you know all the basics!',
+        '',
+        'press ENTER to proceed',
+      ],
+      target: {
+        x: c.canvasWidth / 2,
+        y: c.canvasWidth*3/20,
+        radius: c.canvasWidth/20,
+      },
+      walls: [
+        {
+          start: {x: 0, y: 0},
+          width: c.barrierWidth,
+          height: c.canvasHeight*2/3,
+        },
+        {
+          start: {x: c.canvasWidth - c.barrierWidth, y: c.canvasHeight*1/3},
+          width: c.barrierWidth,
+          height: c.canvasHeight*2/3,
+        },
+        {
+          absorb: true,
+          start: {x: 0, y: c.canvasHeight*2/3},
+          width: c.canvasWidth*2/3,
+          height: c.barrierWidth,
+        },
+        {
+          absorb: true,
+          start: {x: c.canvasWidth*1/3, y: c.canvasHeight*1/3},
+          width: c.canvasWidth*2/3,
+          height: c.barrierWidth,
+        },
+      ],
+    },
+    {
+      title: 'LEVEL COMPLETE',
+      subtitles: [
+        'press ENTER to proceed',
+      ],
+      target: {
+        x: c.canvasWidth / 2,
+        y: c.canvasWidth*5/20,
+        radius: c.canvasWidth/20,
+      },
+      walls: [
+        {
+          start: {x: 0, y: 0},
+          width: c.canvasWidth,
+          height: c.barrierWidth,
+        },
+        {
+          start: {x: c.canvasWidth*1/3, y: c.canvasWidth*10/20 - c.barrierWidth},
+          width: c.canvasWidth*1/3,
+          height: c.barrierWidth,
+        },
+      ],
+    },
+    {
+      title: 'LEVEL COMPLETE',
+      subtitles: [
+        'you win!',
+        '',
+        'press ENTER to restart',
+      ],
+      target: {
+        x: c.canvasWidth*5/6,
+        y: c.canvasHeight*3/8 + c.canvasWidth/40,
+        radius: c.canvasWidth/20,
+      },
+      walls: [
+        ...defaultWalls,
+        {
+          start: {x: 0, y: 0},
+          width: c.canvasWidth,
+          height: c.barrierWidth,
+        },
+        {
+          start: {x: c.canvasWidth*2/3, y: c.canvasHeight*2/4},
+          width: c.canvasWidth*1/3,
+          height: c.barrierWidth,
+        },
+        {
+          absorb: true,
+          start: {x: c.canvasWidth*2/3, y: c.canvasHeight*1/4},
+          width: c.canvasWidth*1/6,
+          height: c.barrierWidth,
+        },
+        {
+          absorb: true,
+          start: {x: c.canvasWidth*2/3, y: c.canvasHeight*1/4},
+          width: c.barrierWidth,
+          height: c.canvasHeight*1/4,
         },
       ],
     },
@@ -216,7 +314,11 @@ const functions = [
         wall.start.y + wall.height > pellet.y
       );
       if (isHit) {
-        app.bounceOffWall(pellet, wall);
+        if (wall.absorb) {
+          app.despawnPellet();
+        } else {
+          app.bounceOffWall(pellet, wall);
+        }
       }
     },
   },

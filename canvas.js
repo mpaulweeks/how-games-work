@@ -46,9 +46,8 @@ app.draw = () => {
     ctx.fill();
   };
 
-  ctx.strokeStyle = '#FFFFFF';
   walls.forEach(wall => {
-    ctx.fillStyle = 'gray';
+    ctx.fillStyle = wall.absorb ? 'yellow' : 'gray';
     ctx.fillRect(wall.start.x, wall.start.y, wall.width, wall.height);
   });
 
