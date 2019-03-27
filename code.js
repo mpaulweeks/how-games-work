@@ -326,8 +326,6 @@ const functions = [
     key: 'runGameLoop',
     output: 'code-loop',
     code: () => {
-      state.ticks += 1;
-
       // check keyboard input, perform actions
       if (keyboard.Space && !state.pellet)
         app.shootPellet(state.shooterNozzle);
@@ -371,7 +369,6 @@ const functions = [
     key: 'loadLevel',
     code: () => {
       state.complete = false;
-      state.ticks = 0;
 
       state.shooterBase.x = canvasElm.width / 2;
       state.shooterBase.y = canvasElm.height - constants.heroSize;
