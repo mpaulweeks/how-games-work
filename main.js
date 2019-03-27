@@ -2,10 +2,11 @@
 const domLookup = {};
 const pointerLinks = {};
 
+const numColors = 12;
 const nextColor = (() => {
   let current = 0;
   return () => {
-    current = (current + 1) % 5;
+    current = (current + 1) % numColors;
     return current;
   };
 })();
