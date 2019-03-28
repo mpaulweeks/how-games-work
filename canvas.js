@@ -11,7 +11,8 @@ app.draw = () => {
     canvasElm.style.width = canvasElm.width + 'px';
   }
 
-  const { buffer, heroSize, enemySize } = constants;
+  const { buffer, enemySize } = constants;
+  const heroSize = canvasElm.height / 25;
   Object.assign(constants, {
     canvasWidth: canvasElm.width,
     canvasHeight: canvasElm.height,
@@ -19,6 +20,11 @@ app.draw = () => {
     maxX: canvasElm.width - (heroSize * 2),
     enemyMinY: buffer,
     enemyMaxY: canvasElm.height / 3,
+    heroSize: heroSize,
+    nozzleLength: heroSize * 2,
+    nozzleWidth: heroSize / 4,
+    heroSpeed: heroSize / 5,
+    bulletSpeed: heroSize / 3,
   });
 
   ctx.fillStyle = '#101050';

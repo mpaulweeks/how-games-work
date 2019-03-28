@@ -19,32 +19,23 @@ const state = {
   walls: [],
 };
 const constants = {
-  heroSize: 20,
-  heroSpeed: 5,
-  bulletSpeed: 10,
-  minX: 0,
-  minY: 0,
-  maxX: 0,
-  maxY: 0,
-  nozzleLength: 40,
   nozzleSpeed: 0.05,
-  nozzleWidth: 6,
-  barrierWidth: 20,
   maxAngle: Math.PI - 0.2,
   minAngle: 0.2,
 };
 
 const getLevelData = () => {
   const c = constants;
+  const barrierWidth = c.heroSize;
   const defaultWalls = [
     {
       start: {x: 0, y: 0},
-      width: c.barrierWidth,
+      width: barrierWidth,
       height: c.canvasHeight,
     },
     {
-      start: {x: c.canvasWidth - c.barrierWidth, y: 0},
-      width: c.barrierWidth,
+      start: {x: c.canvasWidth - barrierWidth, y: 0},
+      width: barrierWidth,
       height: c.canvasHeight,
     },
   ];
@@ -60,7 +51,7 @@ const getLevelData = () => {
       target: {
         x: -500,
         y: -500,
-        radius: c.canvasWidth/10,
+        radius: c.heroSize,
       },
       walls: defaultWalls,
     },
@@ -74,8 +65,8 @@ const getLevelData = () => {
       ],
       target: {
         x: c.canvasWidth / 2,
-        y: c.canvasWidth*2/10,
-        radius: c.canvasWidth/10,
+        y: c.heroSize*4,
+        radius: c.heroSize*2,
       },
       walls: defaultWalls,
     },
@@ -89,8 +80,8 @@ const getLevelData = () => {
       ],
       target: {
         x: c.canvasWidth * 3 / 4,
-        y: c.canvasWidth*2/10,
-        radius: c.canvasWidth/10,
+        y: c.heroSize*4,
+        radius: c.heroSize*2,
       },
       walls: defaultWalls,
     },
@@ -104,24 +95,24 @@ const getLevelData = () => {
       ],
       target: {
         x: c.canvasWidth / 4,
-        y: c.canvasWidth*2/10,
-        radius: c.canvasWidth/10,
+        y: c.heroSize*4,
+        radius: c.heroSize*2,
       },
       walls: [
         {
           start: {x: 0, y: c.canvasHeight / 2},
-          width: c.barrierWidth,
+          width: barrierWidth,
           height: c.canvasHeight,
         },
         {
-          start: {x: c.canvasWidth - c.barrierWidth, y: 0},
-          width: c.barrierWidth,
+          start: {x: c.canvasWidth - barrierWidth, y: 0},
+          width: barrierWidth,
           height: c.canvasHeight,
         },
         {
           start: {x: 0, y: c.canvasHeight / 2},
           width: c.canvasWidth*2/3,
-          height: c.barrierWidth,
+          height: barrierWidth,
         },
       ],
     },
@@ -134,31 +125,31 @@ const getLevelData = () => {
       ],
       target: {
         x: c.canvasWidth / 2,
-        y: c.canvasWidth*3/20,
-        radius: c.canvasWidth/20,
+        y: c.heroSize*3,
+        radius: c.heroSize,
       },
       walls: [
         {
           start: {x: 0, y: 0},
-          width: c.barrierWidth,
+          width: barrierWidth,
           height: c.canvasHeight*2/3,
         },
         {
-          start: {x: c.canvasWidth - c.barrierWidth, y: c.canvasHeight*1/3},
-          width: c.barrierWidth,
+          start: {x: c.canvasWidth - barrierWidth, y: c.canvasHeight*1/3},
+          width: barrierWidth,
           height: c.canvasHeight*2/3,
         },
         {
           absorb: true,
           start: {x: 0, y: c.canvasHeight*2/3},
           width: c.canvasWidth*2/3,
-          height: c.barrierWidth,
+          height: barrierWidth,
         },
         {
           absorb: true,
           start: {x: c.canvasWidth*1/3, y: c.canvasHeight*1/3},
           width: c.canvasWidth*2/3,
-          height: c.barrierWidth,
+          height: barrierWidth,
         },
       ],
     },
@@ -169,19 +160,19 @@ const getLevelData = () => {
       ],
       target: {
         x: c.canvasWidth / 2,
-        y: c.canvasWidth*5/20,
-        radius: c.canvasWidth/20,
+        y: c.heroSize*5,
+        radius: c.heroSize,
       },
       walls: [
         {
           start: {x: 0, y: 0},
           width: c.canvasWidth,
-          height: c.barrierWidth,
+          height: barrierWidth,
         },
         {
-          start: {x: c.canvasWidth*1/3, y: c.canvasWidth*10/20 - c.barrierWidth},
+          start: {x: c.canvasWidth*1/3, y: c.canvasWidth*10/20 - barrierWidth},
           width: c.canvasWidth*1/3,
-          height: c.barrierWidth,
+          height: barrierWidth,
         },
       ],
     },
@@ -194,31 +185,31 @@ const getLevelData = () => {
       ],
       target: {
         x: c.canvasWidth*5/6,
-        y: c.canvasHeight*3/8 + c.canvasWidth/40,
-        radius: c.canvasWidth/20,
+        y: c.canvasHeight*3/8 + c.heroSize/2,
+        radius: c.heroSize,
       },
       walls: [
         ...defaultWalls,
         {
           start: {x: 0, y: 0},
           width: c.canvasWidth,
-          height: c.barrierWidth,
+          height: barrierWidth,
         },
         {
           start: {x: c.canvasWidth*2/3, y: c.canvasHeight*2/4},
           width: c.canvasWidth*1/3,
-          height: c.barrierWidth,
+          height: barrierWidth,
         },
         {
           absorb: true,
           start: {x: c.canvasWidth*2/3, y: c.canvasHeight*1/4},
           width: c.canvasWidth*1/6,
-          height: c.barrierWidth,
+          height: barrierWidth,
         },
         {
           absorb: true,
           start: {x: c.canvasWidth*2/3, y: c.canvasHeight*1/4},
-          width: c.barrierWidth,
+          width: barrierWidth,
           height: c.canvasHeight*1/4,
         },
       ],
