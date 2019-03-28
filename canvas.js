@@ -5,7 +5,8 @@ canvasElm.height = canvasElm.parentElement.clientHeight;
 
 app.canvas = canvasElm;
 app.draw = () => {
-  canvasElm.width = canvasElm.parentElement.clientWidth;
+  canvasElm.width = Math.min(canvasElm.parentElement.clientWidth, canvasElm.height);
+  canvasElm.style.width = canvasElm.width + 'px';
 
   const { buffer, heroSize, enemySize } = constants;
   Object.assign(constants, {
