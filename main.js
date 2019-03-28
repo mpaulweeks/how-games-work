@@ -85,13 +85,14 @@ const connectPointer = (line, func) => {
 const updatePointers = () => {
   Object.keys(pointerLinks).forEach(pointerLinkKey => {
     // todo must be better way than pointing from halfway thru line
+    const scrollOffset = document.documentElement.scrollTop;
     const { pointerElm, line, codeElm } = pointerLinks[pointerLinkKey];
     const lineRect = line.getBoundingClientRect();
     pointerElm.setAttribute('x1', lineRect.x + lineRect.width/2);
-    pointerElm.setAttribute('y1', lineRect.bottom);
+    pointerElm.setAttribute('y1', lineRect.bottom + scrollOffset);
     const funcRect = codeElm.getBoundingClientRect();
     pointerElm.setAttribute('x2', funcRect.left);
-    pointerElm.setAttribute('y2', funcRect.top);
+    pointerElm.setAttribute('y2', funcRect.top + scrollOffset);
   });
 };
 const printState = () => {
