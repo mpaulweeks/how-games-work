@@ -358,7 +358,8 @@ const functions = [
   },
   {
     key: 'loadLevel',
-    code: () => {
+    code: (reload) => {
+      app.calibrateCanvas();
       state.complete = false;
 
       state.shooterBase.x = canvasElm.width / 2;
@@ -368,11 +369,20 @@ const functions = [
       state.pellet = null;
 
       const allLevels = getLevelData();
-      let nextLevelIndex = state.level.index + 1;
-      if (nextLevelIndex >= allLevels.length) {
-        nextLevelIndex = 1;
+      let nextLevelIndex = state.level.index;
+      if (!reload) {
+        nextLevelIndex++;
+        if (nextLevelIndex >= allLevels.length) {
+          nextLevelIndex = 1;
+        }
       }
       state.level = allLevels[nextLevelIndex];
+    },
+  },
+  {
+    key: 'resetLevel',
+    code: () => {
+      app.loadLevel(true);
     },
   },
   {

@@ -1,15 +1,21 @@
 const canvasElm = document.getElementById('canvas-game');
 const ctx = canvasElm.getContext('2d');
 
-canvasElm.height = canvasElm.parentElement.clientHeight;
-
-app.canvas = canvasElm;
-app.draw = () => {
-  const newWidth = Math.min(canvasElm.parentElement.clientWidth, canvasElm.height);
-  if (newWidth !== canvasElm.width) {
+app.calibrateCanvas = () => {
+  // const codeElm = canvasElm.parentElement.parentElement.children[0].children[0];
+  const newHeight = document.body.clientHeight - 135;
+  const newWidth = Math.min(canvasElm.parentElement.clientWidth, newHeight);
+  if (newHeight !== canvasElm.height || newWidth !== canvasElm.width) {
+    canvasElm.height = newHeight;
+    canvasElm.style.height = canvasElm.height + 'px';
     canvasElm.width = newWidth;
     canvasElm.style.width = canvasElm.width + 'px';
   }
+}
+
+app.canvas = canvasElm;
+app.draw = () => {
+  app.calibrateCanvas();
 
   const { buffer, enemySize } = constants;
   const heroSize = canvasElm.height / 25;

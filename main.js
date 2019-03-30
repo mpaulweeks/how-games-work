@@ -137,6 +137,13 @@ window.addEventListener('keyup', evt => {
   app.onKeyUp(evt);
 });
 
+let resizeTimer;
+window.addEventListener('resize', evt => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(function() {
+    app.resetLevel();
+  }, 250);
+});
 
 const runLoop = async () => {
   // try to hide all code blocks
