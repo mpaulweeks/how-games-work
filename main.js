@@ -14,18 +14,14 @@ let toPrint = [];
 
 const printFunc = func => {
   let opacity = 0;
-  let { codeElm, pointerElm } = func;
+  let { codeElm } = func;
   if (codeElm){
     opacity = parseFloat(window.getComputedStyle(codeElm).opacity);
   } else {
     codeElm = func.output ? document.getElementById(func.output) : document.createElement('div');
     codeElm.classList.add('code');
     codeElm.classList.add('showable');
-    pointerElm = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-    pointerElm.classList.add('showable');
-    document.getElementById('svg').appendChild(pointerElm);
     func.codeElm = codeElm;
-    func.pointerElm = pointerElm;
 
     const lineElms = func.display.forEach(line => {
       const lineElm = document.createElement('div');
@@ -42,26 +38,25 @@ const printFunc = func => {
   // add show to make it fade in
   // main loop removes show immediately afterward
   codeElm.classList.add('show');
-  pointerElm.classList.add('show');
   Array.from(codeElm.children).forEach(line => {
-    line.setAttribute('data-color', '');
-    line.classList.remove('highlight');
+    if (line.className.includes('highlight')){
+      line.classList.remove('highlight');
+      line.setAttribute('data-color', '');
+    }
   });
 
   if (!func.output){
     document.getElementById('code-temp').prepend(codeElm);
     if (parseFloat(opacity) === 0){
       func.highlight = nextColor();
+      codeElm.setAttribute('data-color', func.highlight);
     }
-    codeElm.setAttribute('data-color', func.highlight);
-    pointerElm.setAttribute('data-color', func.highlight);
   }
 }
 const printHighlights = () => {
   pendingHighlights.forEach(highlight => {
     const { parent, child } = highlight;
-    const { codeElm } = parent;
-    Array.from(codeElm.children).forEach(line => {
+    Array.from(parent.codeElm.children).forEach(line => {
       if (line.innerHTML.includes(child.key)){
         line.setAttribute('data-color', child.highlight);
         line.classList.add('highlight');
@@ -72,28 +67,33 @@ const printHighlights = () => {
   pendingHighlights = [];
 };
 const connectPointer = (line, func) => {
-  // todo must be better way than pointing from halfway thru line
-  const { pointerElm, codeElm } = func;
-  func.pointerLink = {
-    line,
-    pointerElm,
-    codeElm,
-  };
+  let pointer = func.pointers.filter(p => p.line === line)[0];
+  if (!pointer){
+    const pe = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    pe.classList.add('showable');
+    document.getElementById('svg').appendChild(pe);
+    pointer = {
+      line: line,
+      pointerElm: pe,
+    };
+    func.pointers.push(pointer);
+  }
+  pointer.pointerElm.classList.add('show');
+  pointer.pointerElm.setAttribute('data-color', func.highlight);
 };
 const updatePointers = () => {
   functions.forEach(func => {
     // todo must be better way than pointing from halfway thru line
-    if (!func.pointerLink){
-      return;
-    }
-    const scrollOffset = document.documentElement.scrollTop;
-    const { pointerElm, line, codeElm } = func.pointerLink;
-    const lineRect = line.getBoundingClientRect();
-    pointerElm.setAttribute('x1', lineRect.x + lineRect.width/2);
-    pointerElm.setAttribute('y1', lineRect.bottom + scrollOffset);
-    const funcRect = codeElm.getBoundingClientRect();
-    pointerElm.setAttribute('x2', funcRect.left);
-    pointerElm.setAttribute('y2', funcRect.top + scrollOffset);
+    func.pointers.forEach(pointer => {
+      const scrollOffset = document.documentElement.scrollTop;
+      const { pointerElm, line } = pointer;
+      const lineRect = line.getBoundingClientRect();
+      pointerElm.setAttribute('x1', lineRect.x + lineRect.width/2);
+      pointerElm.setAttribute('y1', lineRect.bottom + scrollOffset);
+      const funcRect = func.codeElm.getBoundingClientRect();
+      pointerElm.setAttribute('x2', funcRect.left);
+      pointerElm.setAttribute('y2', funcRect.top + scrollOffset);
+    });
   });
 };
 const printState = () => {
@@ -149,13 +149,13 @@ window.addEventListener('resize', evt => {
 const runLoop = async () => {
   // try to hide all code blocks
   functions.forEach(func => {
-    const { codeElm, pointerElm } = func;
+    const { codeElm, pointers } = func;
     if (codeElm){
       codeElm.classList.remove('show');
     }
-    if (pointerElm) {
-      pointerElm.classList.remove('show');
-    }
+    pointers.forEach(p => {
+      p.pointerElm.classList.remove('show');
+    });
   });
 
   // run code, maybe show some code blocks

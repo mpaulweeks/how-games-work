@@ -6,4 +6,3 @@
 - split up files
 - add more levels
 - assign colors to funcs?
-- support multiple pointers for each function (eg calcNozzle)
