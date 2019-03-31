@@ -31,7 +31,7 @@ app.draw = () => {
     nozzleLength: heroSize * 2,
     nozzleWidth: heroSize / 4,
     heroSpeed: heroSize / 5,
-    bulletSpeed: heroSize / 3,
+    bulletSpeed: heroSize / 1.5,
   });
 
   ctx.fillStyle = '#101050';

@@ -100,8 +100,6 @@ const functions = [
     output: 'code-loop',
     code: () => {
       // check keyboard input, perform actions
-      if (keyboard.Space)
-        app.shootPellet(state.shooterNozzle);
       if (keyboard.ArrowLeft)
         app.moveHeroLeft();
       if (keyboard.ArrowRight)
@@ -110,6 +108,8 @@ const functions = [
         app.angleHeroLeft();
       if (keyboard.ArrowDown)
         app.angleHeroRight();
+      if (keyboard.Space)
+        app.shootPellet(state.shooterNozzle);
       if (keyboard.Enter && state.complete)
         app.loadLevel();
 

@@ -38,7 +38,7 @@ window.addEventListener('resize', evt => {
   }, 250);
 });
 
-const runLoop = async () => {
+const gameLoop = () => {
   if (!state.paused){
     // try to hide all code blocks
     functions.forEach(func => {
@@ -58,26 +58,30 @@ const runLoop = async () => {
   }
   updatePointers();
   app.draw();
+}
 
-  // return promise that will wait for next frame
-  return new Promise((resolve, reject) => {
-    window.requestAnimationFrame(resolve);
-  });
+const desiredFPS = 15;
+const fpsInterval = 1000/desiredFPS;
+let then = Date.now();
+let now, elapsed;
+
+const loopRunner = () => {
+  requestAnimationFrame(loopRunner);
+
+  // https://stackoverflow.com/a/19772220
+  now = Date.now();
+  elapsed = now - then;
+  if (elapsed > fpsInterval) {
+    // Get ready for next frame by setting then=now, but also adjust for your
+    // specified fpsInterval not being a multiple of RAF's interval (16.7ms)
+    then = now - (elapsed % fpsInterval);
+    gameLoop();
+  }
 };
 
 // init
 (async () => {
-  // paint these once on page load
-  // app.draw();
-  // app.runGameLoop();
-  // app.onKeyDown({code: null});
-  // app.onKeyUp({code: null});
-
-  // init ship at bottom
   app.loadLevel();
   state.complete = true;
-
-  while(true) {
-    await runLoop();
-  }
+  loopRunner();
 })();
