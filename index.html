@@ -24,17 +24,13 @@
       background-color: black;
 
       position: relative;
-      display: flex;
-      flex-direction: column;
-      justify-content: stretch;
-      align-items: stretch;
-      flex-wrap: nowrap;
+      --header-height: 150px;
     }
     #header {
       z-index: 1;
       text-align: center;
-      height: 150px;
-      min-height: 150px;
+      height: var(--header-height);
+      min-height: var(--header-height);
 
       display: flex;
       flex-direction: column;
@@ -51,7 +47,8 @@
     }
     #container {
       z-index: 1;
-      flex-grow: 1;
+
+      height: calc(100% - var(--header-height));
 
       display: flex;
       flex-direction: row;
@@ -115,9 +112,10 @@
     #svg-container {
       z-index: -1;
       position: absolute;
+      top: 0px;
+      left: 0px;
       width: 100%;
-      /*hacky workaround for down arrow scrolling*/
-      height: calc(100% - 50px);
+      height: 100%;
     }
     svg {
       width: 100%;
