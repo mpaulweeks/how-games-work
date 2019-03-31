@@ -32,6 +32,11 @@ const printFunc = func => {
       lineElm.innerHTML = line;
 
       codeElm.appendChild(lineElm);
+      lineElm.addEventListener('click', () => {
+        if (state.paused) {
+          printDuringPause(lineElm);
+        }
+      });
     });
   }
 
@@ -53,14 +58,27 @@ const printFunc = func => {
     }
   }
 }
-const printHighlights = () => {
+const printDuringPause = line => {
+  functions.forEach(func => {
+    func.pointers.forEach(pointer => {
+      if (pointer.line === line){
+        printFunc(func);
+        printHighlight(line, func);
+      }
+    });
+  });
+}
+const printHighlight = (line, func) => {
+  line.setAttribute('data-color', func.highlight);
+  line.classList.add('highlight');
+  connectPointer(line, func);
+}
+const processHighlights = () => {
   pendingHighlights.forEach(highlight => {
     const { parent, child } = highlight;
     Array.from(parent.codeElm.children).forEach(line => {
       if (line.innerHTML.includes(child.key)){
-        line.setAttribute('data-color', child.highlight);
-        line.classList.add('highlight');
-        connectPointer(line, child);
+        printHighlight(line, child);
       }
     });
   });
@@ -147,28 +165,27 @@ window.addEventListener('resize', evt => {
 });
 
 const runLoop = async () => {
-  // try to hide all code blocks
-  functions.forEach(func => {
-    const { codeElm, pointers } = func;
-    if (codeElm){
-      codeElm.classList.remove('show');
-    }
-    pointers.forEach(p => {
-      p.pointerElm.classList.remove('show');
-    });
-  });
-
   if (!state.paused){
+    // try to hide all code blocks
+    functions.forEach(func => {
+      const { codeElm, pointers } = func;
+      if (codeElm){
+        codeElm.classList.remove('show');
+      }
+      pointers.forEach(p => {
+        p.pointerElm.classList.remove('show');
+      });
+    });
+
     // run code, maybe show some code blocks
     // printState();
     // printKeyboard();
     app.runGameLoop();
     toPrint.forEach(printFunc);
     toPrint = [];
-    printHighlights();
-    updatePointers();
+    processHighlights();
   }
-
+  updatePointers();
   app.draw();
 
   // return promise that will wait for next frame
