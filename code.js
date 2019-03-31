@@ -73,9 +73,9 @@ const functions = [
         pellet.dx *= -1;
       }
 
-      // move twice to clear the wall
-      pellet.x += 2 * pellet.dx;
-      pellet.y += 2 * pellet.dy;
+      // move again to get away
+      pellet.x += 1 * pellet.dx;
+      pellet.y += 1 * pellet.dy;
     },
   },
   {
@@ -139,11 +139,13 @@ const functions = [
   {
     key: 'loadLevel',
     code: (reload) => {
-      app.calibrateCanvas();
+      canvas.calibrate();
       state.complete = false;
 
       state.shooterBase.x = canvasElm.width / 2;
-      state.shooterBase.y = canvasElm.height - constants.heroSize;
+      state.shooterBase.y = (
+        canvasElm.height - constants.heroSize
+      );
       state.shooterAngle = Math.PI / 2;
       app.calcNozzlePosition();
       state.pellet = null;

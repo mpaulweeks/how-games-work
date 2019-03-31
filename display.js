@@ -124,6 +124,27 @@ const createPointer = (line, func) => {
 
 // init
 (() => {
+  // make them talk to each other, encapsulate printing
+  functions.forEach(func => {
+    app[func.key] = (...args) => {
+      if (!func.hidePrint){
+        toPrint.push(func);
+      }
+      const parent = callStack.pop();
+      if (parent && !parent.hidePrint){
+        pendingHighlights.push({
+          parent: parent,
+          child: func,
+        });
+        callStack.push(parent);
+      }
+
+      callStack.push(func)
+      const result = func.code(...args);
+      callStack.pop();
+      return result;
+    };
+  });
   const visibleFuncs = functions.filter(f => !f.hidePrint);
   visibleFuncs.forEach(func => {
     createFuncElm(func);

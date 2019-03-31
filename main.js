@@ -1,26 +1,4 @@
 
-// make them talk to each other, surface for printing
-functions.forEach(func => {
-  app[func.key] = (...args) => {
-    if (!func.hidePrint){
-      toPrint.push(func);
-    }
-    const parent = callStack.pop();
-    if (parent && !parent.hidePrint){
-      pendingHighlights.push({
-        parent: parent,
-        child: func,
-      });
-      callStack.push(parent);
-    }
-
-    callStack.push(func)
-    const result = func.code(...args);
-    callStack.pop();
-    return result;
-  };
-});
-
 window.addEventListener('keydown', evt => {
   // console.log(evt.code);
   app.onKeyDown(evt);
@@ -53,11 +31,11 @@ const gameLoop = () => {
 
     // run code, maybe show some code blocks
     app.runGameLoop();
-    processPrints();
-    processHighlights();
+    display.processPrints();
+    display.processHighlights();
   }
-  updatePointers();
-  app.draw();
+  display.updatePointers();
+  canvas.draw();
 }
 
 const desiredFPS = 15;

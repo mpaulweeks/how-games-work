@@ -1,7 +1,7 @@
 const canvasElm = document.getElementById('canvas-game');
 const ctx = canvasElm.getContext('2d');
 
-app.calibrateCanvas = () => {
+const calibrate = () => {
   // const codeElm = canvasElm.parentElement.parentElement.children[0].children[0];
   let newHeight = document.body.clientHeight - document.getElementById('header').clientHeight;
   let newWidth = Math.min(canvasElm.parentElement.clientWidth, newHeight);
@@ -14,9 +14,8 @@ app.calibrateCanvas = () => {
   }
 }
 
-app.canvas = canvasElm;
-app.draw = () => {
-  app.calibrateCanvas();
+const draw = () => {
+  calibrate();
 
   const { buffer, enemySize } = constants;
   const heroSize = canvasElm.height / 25;
@@ -47,7 +46,7 @@ app.draw = () => {
   ctx.beginPath();
   ctx.arc(shooterBase.x, shooterBase.y, heroSize, Math.PI, 2*Math.PI, false);
   ctx.fill();
-  ctx.fillRect(shooterBase.x - heroSize, shooterBase.y, heroSize * 2, heroSize);
+  ctx.fillRect(shooterBase.x - heroSize, shooterBase.y - 1, heroSize * 2, heroSize + 1);
 
   // draw hero nozzle
   ctx.lineWidth = constants.nozzleWidth;
@@ -106,3 +105,8 @@ app.draw = () => {
     }
   }
 }
+
+const canvas = {
+  calibrate,
+  draw,
+};
