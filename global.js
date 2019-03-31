@@ -1,12 +1,4 @@
-const app = {
-  randomShadeOfGrey: () => {
-    function randomNoise(){
-      return Math.floor(Math.random() * 40);
-    }
-    const shade = Math.floor(Math.random() * 100) + 100;
-    return `rgb(${shade + randomNoise()}, ${shade + randomNoise()}, ${shade - randomNoise()})`;
-  },
-};
+const app = {};
 const keyboard = {};
 const state = {
   paused: false,

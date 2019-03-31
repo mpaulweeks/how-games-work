@@ -52,11 +52,8 @@ const runLoop = async () => {
     });
 
     // run code, maybe show some code blocks
-    // printState();
-    // printKeyboard();
     app.runGameLoop();
-    toPrint.forEach(printFunc);
-    toPrint = [];
+    processPrints();
     processHighlights();
   }
   updatePointers();

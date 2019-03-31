@@ -73,6 +73,10 @@ const printHighlight = (line, func) => {
   line.classList.add('highlight');
   connectPointer(line, func);
 }
+const processPrints = () => {
+  toPrint.forEach(printFunc);
+  toPrint = [];
+};
 const processHighlights = () => {
   pendingHighlights.forEach(highlight => {
     const { parent, child } = highlight;
@@ -114,13 +118,3 @@ const updatePointers = () => {
     });
   });
 };
-const printState = () => {
-  document.getElementById('code-state').innerHTML = (
-    JSON.stringify(state, Object.keys(state).sort().concat('x', 'y'), 2)
-  );
-}
-const printKeyboard = () => {
-  document.getElementById('code-keyboard').innerHTML = (
-    JSON.stringify(keyboard, Object.keys(keyboard).sort(), 2)
-  );
-}
