@@ -148,24 +148,26 @@ window.addEventListener('resize', evt => {
 
 const runLoop = async () => {
   // try to hide all code blocks
-  functions.forEach(func => {
-    const { codeElm, pointers } = func;
-    if (codeElm){
-      codeElm.classList.remove('show');
-    }
-    pointers.forEach(p => {
-      p.pointerElm.classList.remove('show');
+  if (!state.paused){
+    functions.forEach(func => {
+      const { codeElm, pointers } = func;
+      if (codeElm){
+        codeElm.classList.remove('show');
+      }
+      pointers.forEach(p => {
+        p.pointerElm.classList.remove('show');
+      });
     });
-  });
 
-  // run code, maybe show some code blocks
-  // printState();
-  // printKeyboard();
-  app.runGameLoop();
-  toPrint.forEach(printFunc);
-  toPrint = [];
-  printHighlights();
-  updatePointers();
+    // run code, maybe show some code blocks
+    // printState();
+    // printKeyboard();
+    app.runGameLoop();
+    toPrint.forEach(printFunc);
+    toPrint = [];
+    printHighlights();
+    updatePointers();
+  }
 
   // return promise that will wait for next frame
   return new Promise((resolve, reject) => {

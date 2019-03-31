@@ -9,6 +9,7 @@ const app = {
 };
 const keyboard = {};
 const state = {
+  paused: false,
   complete: true,
   level: {index: -1},
   shooterBase: {x: 0, y: 0},
@@ -226,6 +227,10 @@ const functions = [
     hidePrint: true,
     output: 'code-keydown',
     code: (evt) => {
+      if (evt.code === 'Escape') {
+        state.paused = !state.paused;
+        return;
+      }
       if (evt.code === 'KeyQ') {
         app.completeLevel();
         return;
