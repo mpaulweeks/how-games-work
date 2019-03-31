@@ -5,4 +5,3 @@
 - fix pointers disappearing off bottom
 - mobile screen
 - set fixed height on pageload, set each column to overflow
-- split up files
