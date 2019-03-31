@@ -3,7 +3,7 @@ const ctx = canvasElm.getContext('2d');
 
 app.calibrateCanvas = () => {
   // const codeElm = canvasElm.parentElement.parentElement.children[0].children[0];
-  const newHeight = document.body.clientHeight - 135;
+  const newHeight = document.body.clientHeight - 150;
   const newWidth = Math.min(canvasElm.parentElement.clientWidth, newHeight);
   if (newHeight !== canvasElm.height || newWidth !== canvasElm.width) {
     canvasElm.height = newHeight;
@@ -75,17 +75,30 @@ app.draw = () => {
     ctx.fill();
   }
 
-  if (state.complete) {
+  if (state.paused || state.complete) {
     ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
     ctx.fillRect(0, 0, canvasElm.width, canvasElm.height);
     ctx.fillStyle = '#FFFFFF';
     ctx.font = '40px monospace';
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'center';
-    ctx.fillText(state.level.title, canvasElm.width/2, (canvasElm.height / 2) - 50);
-    ctx.font = '20px monospace';
-    state.level.subtitles.forEach((subtitle, index) => {
-      ctx.fillText(subtitle, canvasElm.width/2, (canvasElm.height / 2) + 50 + (30*index));
-    });
+
+    if (state.paused) {
+      ctx.fillText('PAUSED', canvasElm.width/2, (canvasElm.height / 2) - 50);
+      ctx.font = '20px monospace';
+      [
+        'hover over code to show it',
+        '',
+        'press ESCAPE to resume',
+      ].forEach((subtitle, index) => {
+        ctx.fillText(subtitle, canvasElm.width/2, (canvasElm.height / 2) + 50 + (30*index));
+      });
+    } else {
+      ctx.fillText(state.level.title, canvasElm.width/2, (canvasElm.height / 2) - 50);
+      ctx.font = '20px monospace';
+      state.level.subtitles.forEach((subtitle, index) => {
+        ctx.fillText(subtitle, canvasElm.width/2, (canvasElm.height / 2) + 50 + (30*index));
+      });
+    }
   }
 }

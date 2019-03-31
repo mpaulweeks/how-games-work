@@ -356,9 +356,6 @@ const functions = [
           app.despawnPellet();
         }
       }
-
-      // update the canvas
-      app.draw();
     },
   },
   {

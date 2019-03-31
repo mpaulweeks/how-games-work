@@ -28,7 +28,7 @@
       flex-wrap: nowrap;
     }
     header {
-      z-index: 2;
+      z-index: 1;
       text-align: center;
     }
     header div {
@@ -39,6 +39,7 @@
       color: lightblue;
     }
     #container {
+      z-index: 1;
       flex-grow: 1;
 
       display: flex;
@@ -98,7 +99,7 @@
       box-sizing: border-box;
     }
     #svg-container {
-      z-index: 1;
+      z-index: -1;
       position: absolute;
       width: 100%;
       /*hacky workaround for down arrow scrolling*/
@@ -109,6 +110,7 @@
       height: 100%;
     }
     line {
+      z-index: 2;
       stroke: white;
       stroke-width: 1;
     }
@@ -166,6 +168,8 @@
       a peek under the hood of a standard "game loop"
       <br/>
       as you play the game, the code will appear in the middle
+      <br/>
+      press the ESCAPE key at any time to pause
       <br/>
       you can view the full source on <a href="https://github.com/mpaulweeks/how-games-work">github</a>
     </p>
