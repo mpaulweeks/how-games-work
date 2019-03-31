@@ -115,15 +115,16 @@ const functions = [
         app.loadLevel();
 
       if (state.pellet) {
+        // move the pellet
         const pellet = state.pellet;
         pellet.x += pellet.dx;
         pellet.y += pellet.dy;
 
+        // check if it collided with anything
         state.level.walls.forEach(wall => {
           app.checkWallHit(pellet, wall);
         });
         app.checkTargetHit(pellet, state.level.target);
-
         const outOfBounds = (
           pellet.x < 0 || pellet.y < 0 ||
           pellet.x > constants.canvasWidth ||
