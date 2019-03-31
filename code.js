@@ -9,6 +9,7 @@ const functions = [
         return;
       }
       if (evt.code === 'KeyQ') {
+        // debugging shortcut
         app.completeLevel();
         return;
       }
@@ -123,10 +124,9 @@ const functions = [
         });
         app.checkTargetHit(pellet, state.level.target);
 
-        let outOfBounds = (
-          pellet.x < 0 ||
+        const outOfBounds = (
+          pellet.x < 0 || pellet.y < 0 ||
           pellet.x > constants.canvasWidth ||
-          pellet.y < 0 ||
           pellet.y > constants.canvasHeight
         );
         if (outOfBounds){
@@ -161,7 +161,9 @@ const functions = [
   {
     key: 'resetLevel',
     code: () => {
+      const wasComplete = state.complete;
       app.loadLevel(true);
+      state.complete = wasComplete;
     },
   },
   {

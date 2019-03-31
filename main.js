@@ -84,4 +84,8 @@ const loopRunner = () => {
   app.loadLevel();
   state.complete = true;
   loopRunner();
+
+  setTimeout(() => {
+    app.resetLevel();
+  }, 100);
 })();

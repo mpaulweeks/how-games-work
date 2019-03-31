@@ -14,10 +14,13 @@
   <script defer src="main.js?v=20180325"></script>
 
   <style>
-    html, body {
+    html {
       height: 100%;
+      font-size: 13px;
     }
     body {
+      height: 100%;
+      font-size: 1rem;
       font-family: monospace;
       margin: 0px;
       color: white;
@@ -28,6 +31,8 @@
     }
     #header {
       z-index: 1;
+      font-size: 1.2rem;
+      font-family: sans-serif;
       text-align: center;
       height: var(--header-height);
       min-height: var(--header-height);
@@ -39,8 +44,9 @@
       flex-wrap: nowrap;
     }
     #header .title {
-      font-size: 3em;
-      margin-bottom: 0.5em;
+      font-size: 2em;
+      text-decoration: underline;
+      margin-bottom: 0.3em;
     }
     #header a {
       color: lightblue;
@@ -177,16 +183,14 @@
   <div id="header">
     <div class="title"> HOW GAMES WORK</div>
     <div>
-      a peek under the hood of a standard "game loop"
+      Take a peek under the hood of a standard game loop!
+      As you play the game, the code will appear in the middle
     </div>
     <div>
-      as you play the game, the code will appear in the middle
+      Press the <b>ESCAPE</b> key at any time to pause and poke around the code
     </div>
     <div>
-      press the ESCAPE key at any time to pause
-    </div>
-    <div>
-      you can view the full source on <a href="https://github.com/mpaulweeks/how-games-work">github</a>
+      You can view the full source on <a href="https://github.com/mpaulweeks/how-games-work">GitHub</a>
     </div>
   </div>
   <div id="container">
