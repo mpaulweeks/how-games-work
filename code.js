@@ -459,4 +459,8 @@ const functions = [
         return line.slice(4) || ' ';
       }
     }),
+    // these are populated by main.js
+    codeElm: undefined,
+    pointerElm: undefined,
+    pointerLink: undefined,
 }));

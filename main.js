@@ -1,6 +1,3 @@
-// todo consolidate, better naming
-const domLookup = {};
-const pointerLinks = {};
 
 const numColors = 12;
 const nextColor = (() => {
@@ -17,7 +14,7 @@ let toPrint = [];
 
 const printFunc = func => {
   let opacity = 0;
-  let { codeElm, pointerElm } = domLookup[func.key] || {};
+  let { codeElm, pointerElm } = func;
   if (codeElm){
     opacity = parseFloat(window.getComputedStyle(codeElm).opacity);
   } else {
@@ -27,7 +24,8 @@ const printFunc = func => {
     pointerElm = document.createElementNS('http://www.w3.org/2000/svg', 'line');
     pointerElm.classList.add('showable');
     document.getElementById('svg').appendChild(pointerElm);
-    domLookup[func.key] = { codeElm, pointerElm };
+    func.codeElm = codeElm;
+    func.pointerElm = pointerElm;
 
     const lineElms = func.display.forEach(line => {
       const lineElm = document.createElement('div');
@@ -62,7 +60,7 @@ const printFunc = func => {
 const printHighlights = () => {
   pendingHighlights.forEach(highlight => {
     const { parent, child } = highlight;
-    const { codeElm } = domLookup[parent.key];
+    const { codeElm } = parent;
     Array.from(codeElm.children).forEach(line => {
       if (line.innerHTML.includes(child.key)){
         line.setAttribute('data-color', child.highlight);
@@ -75,18 +73,21 @@ const printHighlights = () => {
 };
 const connectPointer = (line, func) => {
   // todo must be better way than pointing from halfway thru line
-  const { pointerElm, codeElm } = domLookup[func.key];
-  pointerLinks[func.key] = {
+  const { pointerElm, codeElm } = func;
+  func.pointerLink = {
     line,
     pointerElm,
     codeElm,
   };
 };
 const updatePointers = () => {
-  Object.keys(pointerLinks).forEach(pointerLinkKey => {
+  functions.forEach(func => {
     // todo must be better way than pointing from halfway thru line
+    if (!func.pointerLink){
+      return;
+    }
     const scrollOffset = document.documentElement.scrollTop;
-    const { pointerElm, line, codeElm } = pointerLinks[pointerLinkKey];
+    const { pointerElm, line, codeElm } = func.pointerLink;
     const lineRect = line.getBoundingClientRect();
     pointerElm.setAttribute('x1', lineRect.x + lineRect.width/2);
     pointerElm.setAttribute('y1', lineRect.bottom + scrollOffset);
@@ -147,10 +148,14 @@ window.addEventListener('resize', evt => {
 
 const runLoop = async () => {
   // try to hide all code blocks
-  Object.keys(domLookup).forEach(funcKey => {
-    const { codeElm, pointerElm } = domLookup[funcKey];
-    codeElm.classList.remove('show');
-    pointerElm.classList.remove('show');
+  functions.forEach(func => {
+    const { codeElm, pointerElm } = func;
+    if (codeElm){
+      codeElm.classList.remove('show');
+    }
+    if (pointerElm) {
+      pointerElm.classList.remove('show');
+    }
   });
 
   // run code, maybe show some code blocks
