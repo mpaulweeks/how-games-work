@@ -87,7 +87,9 @@ app.draw = () => {
       ctx.fillText('PAUSED', canvasElm.width/2, (canvasElm.height / 2) - 50);
       ctx.font = '20px monospace';
       [
-        'hover over code to show it',
+        'while the game is paused, you can click',
+        'on function calls to view their code',
+        'eg: app.checkWallHit();',
         '',
         'press ESCAPE to resume',
       ].forEach((subtitle, index) => {
