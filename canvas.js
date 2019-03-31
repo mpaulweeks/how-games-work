@@ -3,7 +3,7 @@ const ctx = canvasElm.getContext('2d');
 
 app.calibrateCanvas = () => {
   // const codeElm = canvasElm.parentElement.parentElement.children[0].children[0];
-  const newHeight = document.body.clientHeight - 150;
+  const newHeight = document.body.clientHeight - document.getElementById('header').clientHeight;
   const newWidth = Math.min(canvasElm.parentElement.clientWidth, newHeight);
   if (newHeight !== canvasElm.height || newWidth !== canvasElm.width) {
     canvasElm.height = newHeight;
