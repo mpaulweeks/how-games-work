@@ -18,7 +18,9 @@ const getLevelData = () => {
       title: 'TRICKSHOT',
       subtitles: [
         'press SPACE to shoot',
-        'you can only have one pellet at a time',
+        '',
+        'note: you can only have one',
+        'projectile on screen at a time',
         '',
         'press ENTER to start',
       ],

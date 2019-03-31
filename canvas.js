@@ -85,22 +85,23 @@ app.draw = () => {
     ctx.textAlign = 'center';
 
     if (state.paused) {
-      ctx.fillText('PAUSED', canvasElm.width/2, (canvasElm.height / 2) - 50);
+      ctx.fillText('PAUSED', canvasElm.width/2, (canvasElm.height * 3/8) - 50);
       ctx.font = '20px monospace';
       [
-        'while the game is paused, you can click',
-        'on function calls to view their code',
+        'while the game is paused,',
+        'you can click on function',
+        'calls to view their code',
         'eg: app.checkWallHit();',
         '',
         'press ESCAPE to resume',
       ].forEach((subtitle, index) => {
-        ctx.fillText(subtitle, canvasElm.width/2, (canvasElm.height / 2) + 50 + (30*index));
+        ctx.fillText(subtitle, canvasElm.width/2, (canvasElm.height * 5/8 ) + (30*index));
       });
     } else {
-      ctx.fillText(state.level.title, canvasElm.width/2, (canvasElm.height / 2) - 50);
+      ctx.fillText(state.level.title, canvasElm.width/2, (canvasElm.height * 3/8) - 50);
       ctx.font = '20px monospace';
       state.level.subtitles.forEach((subtitle, index) => {
-        ctx.fillText(subtitle, canvasElm.width/2, (canvasElm.height / 2) + 50 + (30*index));
+        ctx.fillText(subtitle, canvasElm.width/2, (canvasElm.height * 5/8 ) + (30*index));
       });
     }
   }

@@ -100,7 +100,7 @@ const functions = [
     output: 'code-loop',
     code: () => {
       // check keyboard input, perform actions
-      if (keyboard.Space && !state.pellet)
+      if (keyboard.Space)
         app.shootPellet(state.shooterNozzle);
       if (keyboard.ArrowLeft)
         app.moveHeroLeft();
