@@ -4,14 +4,30 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
 
-  <title>HOW GAMES WORK</title>
+  <title>How Games Work</title>
+  <link rel="shortcut icon" href="favicon.png" />
+  <meta property="og:url"                content="https://mpaulweeks.github.io/how-games-work" />
+  <meta property="og:type"               content="website" />
+  <meta property="og:title"              content="How Games Work" />
+  <meta property="og:description"        content="visualizing a game loop" />
+  <meta property="og:image"              content="https://mpaulweeks.github.io/how-games-work/favicon.png" />
 
-  <script type="module" src="global.js?v=20180325"></script>
-  <script type="module" src="canvas.js?v=20180325"></script>
-  <script type="module" src="level.js?v=20180325"></script>
-  <script type="module" src="code.js?v=20180325"></script>
-  <script type="module" src="display.js?v=20180325"></script>
-  <script type="module" src="main.js?v=20180325"></script>
+  <script type="module" src="global.js?v=20180331"></script>
+  <script type="module" src="canvas.js?v=20180331"></script>
+  <script type="module" src="level.js?v=20180331"></script>
+  <script type="module" src="code.js?v=20180331"></script>
+  <script type="module" src="display.js?v=20180331"></script>
+  <script type="module" src="main.js?v=20180331"></script>
+
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-37989728-22"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-37989728-22');
+  </script>
 
   <style>
     html {
@@ -29,11 +45,13 @@
       position: relative;
       --header-height: 150px;
     }
-    #header {
-      z-index: 1;
+    #header, #mobile {
       font-size: 1.2rem;
       font-family: sans-serif;
       text-align: center;
+    }
+    #header {
+      z-index: 1;
       height: var(--header-height);
       min-height: var(--header-height);
 
@@ -188,7 +206,10 @@
       justify-content: center;
       align-items: center;
       flex-wrap: nowrap;
-      text-align: center;
+    }
+    #mobile img {
+      width: 150px;
+      height: auto;
     }
     @media (max-width: 1300px) {
       body > * {
@@ -202,12 +223,14 @@
 </head>
 <body>
   <div id="mobile">
-    <div class="title"> HOW GAMES WORK</div>
+    <div class="title"><img src="favicon.png"/></div>
+    <div class="title"> How Games Work</div>
     <p>This website does not work without a wide display + keyboard</p>
-    <p>Try zooming out with your browser or visiting it on a desktop</p>
+    <p>Try making your window larger or zooming out with your browser</p>
+    <p>If you're on a mobile device, please check this site out on a computer</p>
   </div>
   <div id="header">
-    <div class="title"> HOW GAMES WORK</div>
+    <div class="title"> How Games Work</div>
     <div>
       Take a peek under the hood of a standard game loop!
       As you play the game, the code will appear in the middle

@@ -1,4 +1,3 @@
 # todo
 
-- favicon, social, anal
-- bust cache
+- more levels
