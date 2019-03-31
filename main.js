@@ -3,22 +3,11 @@ import { canvas } from './canvas.js';
 import { functions } from './code.js';
 import { display } from './display.js';
 
-window.addEventListener('keydown', evt => {
-  // console.log(evt.code);
-  app.onKeyDown(evt);
-});
-window.addEventListener('keyup', evt => {
-  // console.log(evt.code);
-  app.onKeyUp(evt);
-});
-
 let resizeTimer;
-window.addEventListener('resize', evt => {
-  clearTimeout(resizeTimer);
-  resizeTimer = setTimeout(function() {
-    app.resetLevel();
-  }, 250);
-});
+const desiredFPS = 15;
+const fpsInterval = 1000/desiredFPS;
+let then = Date.now();
+let now, elapsed;
 
 const gameLoop = () => {
   if (!state.paused){
@@ -42,11 +31,6 @@ const gameLoop = () => {
   canvas.draw();
 }
 
-const desiredFPS = 15;
-const fpsInterval = 1000/desiredFPS;
-let then = Date.now();
-let now, elapsed;
-
 const loopRunner = () => {
   requestAnimationFrame(loopRunner);
 
@@ -63,6 +47,20 @@ const loopRunner = () => {
 
 // init
 (async () => {
+  window.addEventListener('keydown', evt => {
+    app.onKeyDown(evt);
+  });
+  window.addEventListener('keyup', evt => {
+    app.onKeyUp(evt);
+  });
+  window.addEventListener('resize', evt => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function() {
+      app.resetLevel();
+    }, 250);
+  });
+
+  display.init();
   app.loadLevel();
   state.complete = true;
   loopRunner();

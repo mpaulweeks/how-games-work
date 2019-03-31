@@ -123,9 +123,8 @@ const createPointer = (line, func) => {
   });
 };
 
-// init
-(() => {
-  // make them talk to each other, encapsulate printing
+const init = () => {
+  // attach functions to app with wrapper
   functions.forEach(func => {
     app[func.key] = (...args) => {
       if (!func.hidePrint){
@@ -162,9 +161,10 @@ const createPointer = (line, func) => {
       });
     });
   });
-})();
+};
 
 export const display = {
+  init,
   processPrints,
   processHighlights,
   updatePointers,
