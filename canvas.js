@@ -1,3 +1,5 @@
+import { state, constants } from './global.js';
+
 const canvasElm = document.getElementById('canvas-game');
 const ctx = canvasElm.getContext('2d');
 
@@ -106,7 +108,7 @@ const draw = () => {
   }
 }
 
-const canvas = {
+export const canvas = {
   calibrate,
   draw,
 };

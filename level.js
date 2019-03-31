@@ -1,4 +1,6 @@
-const getLevelData = () => {
+import { constants } from './global.js';
+
+export const getLevelData = () => {
   const c = constants;
   const barrierWidth = c.heroSize;
   const defaultWalls = [

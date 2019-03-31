@@ -1,3 +1,5 @@
+import { app, state } from './global.js';
+import { functions } from './code.js';
 
 const numColors = 12;
 const nextColor = (() => {
@@ -109,11 +111,10 @@ const createPointer = (line, func) => {
   const pe = document.createElementNS('http://www.w3.org/2000/svg', 'line');
   pe.classList.add('showable');
   document.getElementById('svg').appendChild(pe);
-  pointer = {
+  func.pointers.push({
     line: line,
     pointerElm: pe,
-  };
-  func.pointers.push(pointer);
+  });
   line.classList.add('clickable');
   line.addEventListener('click', () => {
     if (state.paused) {
@@ -163,7 +164,7 @@ const createPointer = (line, func) => {
   });
 })();
 
-const display = {
+export const display = {
   processPrints,
   processHighlights,
   updatePointers,

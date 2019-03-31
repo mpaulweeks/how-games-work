@@ -1,4 +1,8 @@
-const functions = [
+import { app, keyboard, constants, state } from './global.js';
+import { canvas } from './canvas.js';
+import { getLevelData } from './level.js';
+
+export const functions = [
   {
     key: 'onKeyDown',
     hidePrint: true,
@@ -142,9 +146,9 @@ const functions = [
       canvas.calibrate();
       state.complete = false;
 
-      state.shooterBase.x = canvasElm.width / 2;
+      state.shooterBase.x = constants.canvasWidth / 2;
       state.shooterBase.y = (
-        canvasElm.height - constants.heroSize
+        constants.canvasHeight - constants.heroSize
       );
       state.shooterAngle = Math.PI / 2;
       app.calcNozzlePosition();

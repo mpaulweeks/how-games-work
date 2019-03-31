@@ -1,3 +1,7 @@
+import { app, state } from './global.js';
+import { canvas } from './canvas.js';
+import { functions } from './code.js';
+import { display } from './display.js';
 
 window.addEventListener('keydown', evt => {
   // console.log(evt.code);
